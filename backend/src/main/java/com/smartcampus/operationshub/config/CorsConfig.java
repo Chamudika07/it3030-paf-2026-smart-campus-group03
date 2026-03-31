@@ -13,7 +13,14 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(AppProperties appProperties) {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(appProperties.getCors().getAllowedOrigins()));
+        String allowedOrigins = appProperties.getCors() == null
+                ? null
+                : appProperties.getCors().getAllowedOrigins();
+        configuration.setAllowedOrigins(List.of(
+                allowedOrigins == null || allowedOrigins.isBlank()
+                        ? "http://localhost:5173"
+                        : allowedOrigins
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -23,4 +30,3 @@ public class CorsConfig {
         return source;
     }
 }
-

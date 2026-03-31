@@ -25,6 +25,10 @@ spring:
               - openid
               - profile
               - email
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 15MB
 
 server:
   port: ${SERVER_PORT:8080}
@@ -32,3 +36,5 @@ server:
 app:
   cors:
     allowed-origins: ${FRONTEND_URL:http://localhost:5173}
+  storage:
+    ticket-attachments-dir: ${TICKET_ATTACHMENTS_DIR:uploads/tickets}

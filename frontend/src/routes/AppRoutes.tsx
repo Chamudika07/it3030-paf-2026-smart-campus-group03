@@ -8,6 +8,8 @@ import { TicketsPage } from "../pages/TicketsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 import { LoginPage } from "../pages/LoginPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
+import { CreateTicketPage } from "../pages/tickets/CreateTicketPage";
+import { TicketDetailsPage } from "../pages/tickets/TicketDetailsPage";
 
 export function AppRoutes() {
   return useRoutes([
@@ -28,6 +30,8 @@ export function AppRoutes() {
         { path: "resources", element: <ResourcesPage /> },
         { path: "bookings", element: <BookingsPage /> },
         { path: "tickets", element: <TicketsPage /> },
+        { path: "tickets/new", element: <CreateTicketPage /> },
+        { path: "tickets/:ticketId", element: <TicketDetailsPage /> },
         { path: "notifications", element: <NotificationsPage /> }
       ]
     },
@@ -37,4 +41,3 @@ export function AppRoutes() {
     }
   ]);
 }
-
