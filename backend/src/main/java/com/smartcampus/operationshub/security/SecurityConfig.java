@@ -21,6 +21,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/health", "/error").permitAll()
                         .requestMatchers("/api/resources/**").permitAll()
+                        .requestMatchers("/api/tickets/**", "/api/comments/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(Customizer.withDefaults());
@@ -28,4 +29,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-

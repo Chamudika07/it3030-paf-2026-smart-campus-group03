@@ -10,11 +10,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AppProperties {
 
     private Cors cors = new Cors();
+    private Storage storage = new Storage();
 
     @Getter
     @Setter
     public static class Cors {
         private String allowedOrigins;
     }
-}
 
+    @Getter
+    @Setter
+    public static class Storage {
+        private String ticketAttachmentsDir = "uploads/tickets";
+    }
+}
