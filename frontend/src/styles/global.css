@@ -405,6 +405,87 @@ textarea {
   font-weight: 700;
 }
 
+/* Search Filter Styles */
+.search-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 33, 47, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(15, 42, 61, 0.08);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-input,
+.filter-select {
+  min-width: 140px;
+  max-width: 180px;
+}
+
+.search-filter button {
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: #0d9488;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0b7a70;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #0f2a3d;
+  border: 1px solid rgba(16, 33, 47, 0.14);
+}
+
+.btn-secondary:hover {
+  background: rgba(16, 33, 47, 0.05);
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-active {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.badge-inactive {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
 @media (max-width: 900px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -432,5 +513,17 @@ textarea {
 
   .comment-header {
     flex-direction: column;
+  }
+
+  .search-filter {
+    flex-direction: column;
+  }
+
+  .search-input,
+  .filter-input,
+  .filter-select,
+  .search-filter button {
+    width: 100%;
+    max-width: 100%;
   }
 }
