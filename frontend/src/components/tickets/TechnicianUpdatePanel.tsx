@@ -1,23 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { assignTechnician, updateTicketStatus } from "../../api/ticketApi";
-import {
-  formatTicketText
-} from "./ticketAppearance";
+import { formatTicketText } from "./ticketAppearance";
 import { TicketBadge } from "./TicketBadge";
 import { ticketStatusOptions, type Ticket, type TicketStatus } from "../../types/ticket";
 
 type TechnicianUpdatePanelProps = {
   ticket: Ticket;
-  canManage: boolean;
   onTicketUpdated: (ticket: Ticket) => void;
 };
 
-export function TechnicianUpdatePanel({
-  ticket,
-  canManage,
-  onTicketUpdated
-}: TechnicianUpdatePanelProps) {
+export function TechnicianUpdatePanel({ ticket, onTicketUpdated }: TechnicianUpdatePanelProps) {
   const [assignForm, setAssignForm] = useState({
     technicianIdentifier: ticket.assignedTechnician?.identifier ?? "",
     technicianName: ticket.assignedTechnician?.name ?? "",
@@ -28,6 +21,19 @@ export function TechnicianUpdatePanel({
   const [rejectionReason, setRejectionReason] = useState(ticket.rejectionReason ?? "");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const canAssign = ticket.assignAllowed;
+  const canUpdateStatus = ticket.statusUpdateAllowed;
+
+  useEffect(() => {
+    setAssignForm({
+      technicianIdentifier: ticket.assignedTechnician?.identifier ?? "",
+      technicianName: ticket.assignedTechnician?.name ?? "",
+      technicianEmail: ticket.assignedTechnician?.email ?? ""
+    });
+    setStatus(ticket.status);
+    setResolutionNotes(ticket.resolutionNotes ?? "");
+    setRejectionReason(ticket.rejectionReason ?? "");
+  }, [ticket]);
 
   const allowedStatusOptions = useMemo(() => {
     switch (ticket.status) {
@@ -48,6 +54,10 @@ export function TechnicianUpdatePanel({
 
   async function handleAssign(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canAssign) {
+      return;
+    }
+
     if (!assignForm.technicianIdentifier.trim() || !assignForm.technicianName.trim()) {
       setError("Technician identifier and name are required.");
       return;
@@ -71,6 +81,10 @@ export function TechnicianUpdatePanel({
 
   async function handleStatusUpdate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canUpdateStatus) {
+      return;
+    }
+
     setBusy(true);
     setError("");
     try {
@@ -87,13 +101,17 @@ export function TechnicianUpdatePanel({
     }
   }
 
-  if (!canManage) {
+  if (!canAssign && !canUpdateStatus) {
     return (
-      <section className="panel stack">
-        <div className="section-heading">
-          <h3>Technician Actions</h3>
+      <section className="panel stack technician-panel">
+        <div className="technician-panel-header">
+          <div>
+            <p className="eyebrow">Operations Controls</p>
+            <h3>Technician Actions</h3>
+          </div>
+          <TicketBadge value={ticket.status} kind="status" />
         </div>
-        <p className="muted-text">
+        <p className="muted-text technician-panel-intro">
           Only admins can assign a technician. Admins and the assigned technician can move the
           ticket through its workflow.
         </p>
@@ -102,92 +120,164 @@ export function TechnicianUpdatePanel({
   }
 
   return (
-    <section className="panel stack">
-      <div className="section-heading">
-        <h3>Technician Actions</h3>
+    <section className="panel stack technician-panel">
+      <div className="technician-panel-header">
+        <div>
+          <p className="eyebrow">Operations Controls</p>
+          <h3>Technician Actions</h3>
+          <p className="muted-text technician-panel-intro">
+            Keep assignment details and ticket workflow updates in one structured workspace.
+          </p>
+        </div>
         <TicketBadge value={ticket.status} kind="status" />
       </div>
 
-      <form className="stack" onSubmit={handleAssign}>
-        <div className="form-grid">
-          <label className="field-group">
-            <span>Technician ID</span>
-            <input
-              value={assignForm.technicianIdentifier}
-              onChange={(event) =>
-                setAssignForm((current) => ({
-                  ...current,
-                  technicianIdentifier: event.target.value
-                }))
-              }
-            />
-          </label>
-          <label className="field-group">
-            <span>Technician Name</span>
-            <input
-              value={assignForm.technicianName}
-              onChange={(event) =>
-                setAssignForm((current) => ({ ...current, technicianName: event.target.value }))
-              }
-            />
-          </label>
-          <label className="field-group">
-            <span>Technician Email</span>
-            <input
-              type="email"
-              value={assignForm.technicianEmail}
-              onChange={(event) =>
-                setAssignForm((current) => ({ ...current, technicianEmail: event.target.value }))
-              }
-            />
-          </label>
-        </div>
-        <div className="form-actions">
-          <button type="submit" disabled={busy}>
-            {busy ? "Saving..." : "Assign Technician"}
-          </button>
-        </div>
-      </form>
+      <div className="stack technician-control-stack">
+        <form className="stack form-section-card" onSubmit={handleAssign}>
+          <div className="form-section-header">
+            <div>
+              <h4>Assignment Details</h4>
+              <p className="section-copy">
+                Capture the technician owner clearly so the team can see who is responsible.
+              </p>
+            </div>
+            <span className={`mini-status-chip ${canAssign ? "chip-ready" : "chip-locked"}`}>
+              {canAssign ? "Editable" : "View only"}
+            </span>
+          </div>
 
-      <form className="stack" onSubmit={handleStatusUpdate}>
-        <div className="form-grid">
-          <label className="field-group">
-            <span>Status</span>
-            <select value={status} onChange={(event) => setStatus(event.target.value as TicketStatus)}>
-              {allowedStatusOptions.map((option) => (
-                <option key={option} value={option}>
-                  {formatTicketText(option)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field-group">
-            <span>Resolution Notes</span>
-            <textarea
-              className="field-textarea"
-              rows={4}
-              value={resolutionNotes}
-              onChange={(event) => setResolutionNotes(event.target.value)}
-              placeholder="Required when the ticket is resolved."
-            />
-          </label>
-          <label className="field-group">
-            <span>Rejection Reason</span>
-            <textarea
-              className="field-textarea"
-              rows={4}
-              value={rejectionReason}
-              onChange={(event) => setRejectionReason(event.target.value)}
-              placeholder="Required when the ticket is rejected."
-            />
-          </label>
-        </div>
-        <div className="form-actions">
-          <button type="submit" disabled={busy}>
-            {busy ? "Updating..." : "Update Status"}
-          </button>
-        </div>
-      </form>
+          <div className="technician-form-grid">
+            <label className="field-group">
+              <span>Technician ID</span>
+              <div className="field-surface">
+                <input
+                  value={assignForm.technicianIdentifier}
+                  onChange={(event) =>
+                    setAssignForm((current) => ({
+                      ...current,
+                      technicianIdentifier: event.target.value
+                    }))
+                  }
+                  placeholder="EMP-204"
+                  disabled={!canAssign || busy}
+                />
+              </div>
+            </label>
+            <label className="field-group">
+              <span>Technician Name</span>
+              <div className="field-surface">
+                <input
+                  value={assignForm.technicianName}
+                  onChange={(event) =>
+                    setAssignForm((current) => ({ ...current, technicianName: event.target.value }))
+                  }
+                  placeholder="Alex Fernando"
+                  disabled={!canAssign || busy}
+                />
+              </div>
+            </label>
+            <label className="field-group field-group-wide">
+              <span>Technician Email</span>
+              <div className="field-surface">
+                <input
+                  type="email"
+                  value={assignForm.technicianEmail}
+                  onChange={(event) =>
+                    setAssignForm((current) => ({ ...current, technicianEmail: event.target.value }))
+                  }
+                  placeholder="technician@campus.edu"
+                  disabled={!canAssign || busy}
+                />
+              </div>
+              <small className="field-note">
+                Use a campus email when available so communication stays consistent.
+              </small>
+            </label>
+          </div>
+
+          {canAssign && (
+            <div className="technician-actions-row">
+              <button type="submit" className="button-block" disabled={busy}>
+                {busy ? "Saving..." : "Save Technician Assignment"}
+              </button>
+            </div>
+          )}
+        </form>
+
+        <form className="stack form-section-card" onSubmit={handleStatusUpdate}>
+          <div className="form-section-header">
+            <div>
+              <h4>Workflow Update</h4>
+              <p className="section-copy">
+                Update the ticket stage and record a clear outcome before closing or rejecting it.
+              </p>
+            </div>
+            <span className={`mini-status-chip ${canUpdateStatus ? "chip-ready" : "chip-locked"}`}>
+              {canUpdateStatus ? "Editable" : "View only"}
+            </span>
+          </div>
+
+          <div className="technician-form-grid">
+            <label className="field-group">
+              <span>Status</span>
+              <div className="field-surface">
+                <select
+                  value={status}
+                  onChange={(event) => setStatus(event.target.value as TicketStatus)}
+                  disabled={!canUpdateStatus || busy}
+                >
+                  {allowedStatusOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {formatTicketText(option)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </label>
+            <div className="field-hint">
+              <p className="field-hint-title">Workflow guidance</p>
+              <p className="field-hint-copy">
+                Add resolution notes for resolved tickets and a rejection reason when work cannot
+                proceed.
+              </p>
+            </div>
+            <label className="field-group field-group-wide">
+              <span>Resolution Notes</span>
+              <div className="field-surface">
+                <textarea
+                  className="field-textarea"
+                  rows={4}
+                  value={resolutionNotes}
+                  onChange={(event) => setResolutionNotes(event.target.value)}
+                  placeholder="Explain what was fixed, replaced, or verified."
+                  disabled={!canUpdateStatus || busy}
+                />
+              </div>
+            </label>
+            <label className="field-group field-group-wide">
+              <span>Rejection Reason</span>
+              <div className="field-surface">
+                <textarea
+                  className="field-textarea"
+                  rows={4}
+                  value={rejectionReason}
+                  onChange={(event) => setRejectionReason(event.target.value)}
+                  placeholder="Explain why this request was rejected or cannot continue."
+                  disabled={!canUpdateStatus || busy}
+                />
+              </div>
+            </label>
+          </div>
+
+          {canUpdateStatus && (
+            <div className="technician-actions-row">
+              <button type="submit" className="button-block" disabled={busy}>
+                {busy ? "Updating..." : "Save Workflow Update"}
+              </button>
+            </div>
+          )}
+        </form>
+      </div>
 
       {error && <div className="error-panel panel-inline">{error}</div>}
     </section>

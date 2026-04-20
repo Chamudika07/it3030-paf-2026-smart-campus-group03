@@ -5,12 +5,10 @@ import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPrevie
 import { CommentSection } from "../../components/tickets/CommentSection";
 import { TechnicianUpdatePanel } from "../../components/tickets/TechnicianUpdatePanel";
 import { TicketBadge } from "../../components/tickets/TicketBadge";
-import { useAuth } from "../../hooks/useAuth";
 import type { Ticket } from "../../types/ticket";
 
 export function TicketDetailsPage() {
   const { ticketId } = useParams();
-  const { user } = useAuth();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -43,11 +41,6 @@ export function TicketDetailsPage() {
   if (error || !ticket) {
     return <section className="panel error-panel">{error || "Ticket not found."}</section>;
   }
-
-  const canManage =
-    user?.role === "ADMIN" ||
-    (user?.role === "TECHNICIAN" &&
-      user.name.toLowerCase().replace(/\s+/g, "-") === ticket.assignedTechnician?.identifier);
 
   return (
     <section className="stack">
@@ -116,11 +109,7 @@ export function TicketDetailsPage() {
         </section>
 
         <div className="stack">
-          <TechnicianUpdatePanel
-            ticket={ticket}
-            canManage={canManage}
-            onTicketUpdated={setTicket}
-          />
+          <TechnicianUpdatePanel ticket={ticket} onTicketUpdated={setTicket} />
           <CommentSection ticket={ticket} onTicketUpdated={setTicket} />
         </div>
       </div>
