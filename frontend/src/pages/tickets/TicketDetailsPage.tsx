@@ -70,81 +70,77 @@ export function TicketDetailsPage() {
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.8fr)]">
-        <Card as="section" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-2">
-            <div className="rounded-2xl bg-[#F8FAFC] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
-                Category
-              </p>
-              <strong className="mt-2 block text-base text-[#0F172A]">{ticket.category}</strong>
-            </div>
-            <div className="rounded-2xl bg-[#F8FAFC] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
-                Preferred Contact
-              </p>
-              <strong className="mt-2 block text-base text-[#0F172A]">{ticket.preferredContact}</strong>
-            </div>
-            <div className="rounded-2xl bg-[#F8FAFC] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
-                Location
-              </p>
-              <strong className="mt-2 block text-base text-[#0F172A]">
-                {ticket.locationText || "Not provided"}
-              </strong>
-            </div>
-            <div className="rounded-2xl bg-[#F8FAFC] p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
-                Resource
-              </p>
-              <strong className="mt-2 block text-base text-[#0F172A]">
-                {ticket.resourceName || "No linked resource"}
-              </strong>
-            </div>
-            <div className="rounded-2xl bg-[#F8FAFC] p-4 md:col-span-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
-                Assigned Technician
-              </p>
-              <strong className="mt-2 block text-base text-[#0F172A]">
-                {ticket.assignedTechnician?.name || "Not assigned yet"}
-              </strong>
-            </div>
-          </div>
-
-          <div className="space-y-3">
+      <Card as="section" className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
-              Description
+              Category
             </p>
-            <p className="whitespace-pre-wrap text-sm leading-7 text-[#334155]">
-              {ticket.description}
-            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">{ticket.category}</strong>
           </div>
-
-          {ticket.resolutionNotes && (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-                Resolution Notes
-              </p>
-              <p className="mt-2 text-sm leading-6 text-emerald-800">{ticket.resolutionNotes}</p>
-            </div>
-          )}
-
-          {ticket.rejectionReason && (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
-                Rejection Reason
-              </p>
-              <p className="mt-2 text-sm leading-6 text-rose-800">{ticket.rejectionReason}</p>
-            </div>
-          )}
-
-          <AttachmentPreviewGrid attachments={ticket.attachments} />
-        </Card>
-
-        <div className="space-y-6">
-          <TechnicianUpdatePanel ticket={ticket} onTicketUpdated={setTicket} />
-          <CommentSection ticket={ticket} onTicketUpdated={setTicket} />
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Preferred Contact
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">{ticket.preferredContact}</strong>
+          </div>
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Location
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">
+              {ticket.locationText || "Not provided"}
+            </strong>
+          </div>
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Resource
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">
+              {ticket.resourceName || "No linked resource"}
+            </strong>
+          </div>
+          <div className="rounded-2xl bg-[#F8FAFC] p-4 md:col-span-2 xl:col-span-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Assigned Technician
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">
+              {ticket.assignedTechnician?.name || "Not assigned yet"}
+            </strong>
+          </div>
         </div>
+
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+            Description
+          </p>
+          <p className="whitespace-pre-wrap text-sm leading-7 text-[#334155]">{ticket.description}</p>
+        </div>
+
+        {ticket.resolutionNotes && (
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+              Resolution Notes
+            </p>
+            <p className="mt-2 text-sm leading-6 text-emerald-800">{ticket.resolutionNotes}</p>
+          </div>
+        )}
+
+        {ticket.rejectionReason && (
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+              Rejection Reason
+            </p>
+            <p className="mt-2 text-sm leading-6 text-rose-800">{ticket.rejectionReason}</p>
+          </div>
+        )}
+
+        <AttachmentPreviewGrid attachments={ticket.attachments} />
+      </Card>
+
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
+        <TechnicianUpdatePanel ticket={ticket} onTicketUpdated={setTicket} />
+        <CommentSection ticket={ticket} onTicketUpdated={setTicket} />
       </div>
     </section>
   );

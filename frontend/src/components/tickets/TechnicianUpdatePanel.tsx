@@ -116,7 +116,7 @@ export function TechnicianUpdatePanel({ ticket, onTicketUpdated }: TechnicianUpd
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94A3B8]">
               Operations Controls
             </p>
-            <h3 className="mt-2 text-lg font-semibold text-[#0F172A]">Technician Actions</h3>
+            <h3 className="mt-2 text-lg font-semibold text-[#0F172A]">Operations Controls</h3>
           </div>
           <TicketBadge value={ticket.status} kind="status" />
         </div>
@@ -135,7 +135,7 @@ export function TechnicianUpdatePanel({ ticket, onTicketUpdated }: TechnicianUpd
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94A3B8]">
             Operations Controls
           </p>
-          <h3 className="mt-2 text-lg font-semibold text-[#0F172A]">Technician Actions</h3>
+          <h3 className="mt-2 text-lg font-semibold text-[#0F172A]">Operations Controls</h3>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#334155]">
             Keep assignment details and ticket workflow updates in one structured workspace.
           </p>
