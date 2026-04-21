@@ -31,3 +31,8 @@ export async function searchResources(filters: SearchFilters) {
   return response.data.data;
 }
 
+export async function createResource(payload: Omit<Resource, "id" | "active">) {
+  const response = await http.post<ApiResponse<Resource>>("/resources", payload);
+  return response.data.data;
+}
+

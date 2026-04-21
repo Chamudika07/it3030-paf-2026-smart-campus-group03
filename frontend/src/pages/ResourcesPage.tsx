@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchResources, searchResources as searchResourcesApi } from "../api/resourceApi";
 import { ResourceSearchFilter } from "../components/resources/ResourceSearchFilter";
 import { ResourceStatusBadge } from "../components/resources/ResourceStatusBadge";
@@ -6,6 +7,7 @@ import type { Resource } from "../types/resource";
 import type { SearchFilters } from "../api/resourceApi";
 
 export function ResourcesPage() {
+  const navigate = useNavigate();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,6 +49,22 @@ export function ResourcesPage() {
           <p className="eyebrow">Member 1 ownership</p>
           <h2>Resources</h2>
           <p className="muted-text">Manage campus facilities and assets</p>
+        </div>
+        <div className="header-buttons">
+          <button
+            onClick={() => navigate("/resources/codes")}
+            className="button button-secondary"
+            style={{ alignSelf: "flex-start", marginTop: "0.5rem" }}
+          >
+            📋 Browse Codes
+          </button>
+          <button
+            onClick={() => navigate("/resources/new")}
+            className="button button-primary"
+            style={{ alignSelf: "flex-start", marginTop: "0.5rem" }}
+          >
+            + Create Resource
+          </button>
         </div>
       </div>
 
@@ -95,6 +113,114 @@ export function ResourcesPage() {
           </table>
         </div>
       )}
+
+      <style>{`
+        .page-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 2rem;
+          margin-bottom: 1rem;
+        }
+
+        .header-buttons {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        .button {
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 0.375rem;
+          font-size: 0.95rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .button-primary {
+          background-color: #3b82f6;
+          color: white;
+        }
+
+        .button-primary:hover {
+          background-color: #2563eb;
+        }
+
+        .button-secondary {
+          background-color: #e5e7eb;
+          color: #1f2937;
+        }
+
+        .button-secondary:hover {
+          background-color: #d1d5db;
+        }
+
+        .panel {
+          padding: 1.5rem;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          background-color: white;
+        }
+
+        .error-panel {
+          background-color: #fee;
+          border-color: #fcc;
+          color: #c33;
+        }
+
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .table th {
+          text-align: left;
+          padding: 1rem;
+          border-bottom: 2px solid #e5e7eb;
+          font-weight: 600;
+          background-color: #f9fafb;
+        }
+
+        .table td {
+          padding: 1rem;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table tbody tr:hover {
+          background-color: #f9fafb;
+        }
+
+        .stack {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .eyebrow {
+          color: #6b7280;
+          font-size: 0.875rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .page-header h2 {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #1f2937;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .muted-text {
+          color: #6b7280;
+          margin: 0;
+        }
+      `}</style>
     </section>
   );
 }

@@ -3,6 +3,8 @@ import { DashboardLayout } from "../layouts/DashboardLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { DashboardPage } from "../pages/DashboardPage";
 import { ResourcesPage } from "../pages/ResourcesPage";
+import { CreateResourcePage } from "../pages/CreateResourcePage";
+import { ResourceCodeBrowser } from "../pages/ResourceCodeBrowser";
 import { BookingsPage } from "../pages/BookingsPage";
 import { TicketsPage } from "../pages/TicketsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
@@ -28,6 +30,8 @@ export function AppRoutes() {
         { index: true, element: <Navigate to="/dashboard" replace /> },
         { path: "dashboard", element: <DashboardPage /> },
         { path: "resources", element: <ResourcesPage /> },
+        { path: "resources/new", element: <CreateResourcePage /> },
+        { path: "resources/codes", element: <ResourceCodeBrowser /> },
         { path: "bookings", element: <BookingsPage /> },
         { path: "tickets", element: <TicketsPage /> },
         { path: "tickets/new", element: <CreateTicketPage /> },
