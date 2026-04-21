@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchResources } from "../api/resourceApi";
+import { BackButton } from "../components/common/BackButton";
 import type { Resource, ResourceCategory } from "../types/resource";
 
 export function ResourceCodeBrowser() {
@@ -65,6 +66,7 @@ export function ResourceCodeBrowser() {
           <h2>Resource Codes</h2>
           <p className="muted-text">Browse and search all available resource codes</p>
         </div>
+        <BackButton label="← Back" fallbackPath="/resources" />
       </div>
 
       {/* Filters */}
@@ -333,6 +335,29 @@ export function ResourceCodeBrowser() {
         .badge-inactive {
           background-color: #fee2e2;
           color: #991b1b;
+        }
+
+        .back-button {
+          padding: 0.75rem 1.5rem;
+          border: 1px solid #d1d5db;
+          border-radius: 0.375rem;
+          font-size: 0.95rem;
+          font-weight: 600;
+          background-color: #f9fafb;
+          color: #374151;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+          height: fit-content;
+        }
+
+        .back-button:hover {
+          background-color: #e5e7eb;
+          border-color: #9ca3af;
+        }
+
+        .back-button:active {
+          background-color: #d1d5db;
         }
       `}</style>
     </section>

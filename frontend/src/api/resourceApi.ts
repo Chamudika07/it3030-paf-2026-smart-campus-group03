@@ -14,6 +14,14 @@ export type SearchFilters = {
   active?: boolean;
 };
 
+export type UpdateResourcePayload = {
+  name: string;
+  category: ResourceCategory;
+  location: string;
+  capacity: number;
+  active: boolean;
+};
+
 export async function fetchResources() {
   const response = await http.get<ApiResponse<Resource[]>>("/resources");
   return response.data.data;
@@ -31,8 +39,18 @@ export async function searchResources(filters: SearchFilters) {
   return response.data.data;
 }
 
+export async function fetchResourceById(id: number) {
+  const response = await http.get<ApiResponse<Resource>>(`/resources/${id}`);
+  return response.data.data;
+}
+
 export async function createResource(payload: Omit<Resource, "id" | "active">) {
   const response = await http.post<ApiResponse<Resource>>("/resources", payload);
+  return response.data.data;
+}
+
+export async function updateResource(id: number, payload: UpdateResourcePayload) {
+  const response = await http.put<ApiResponse<Resource>>(`/resources/${id}`, payload);
   return response.data.data;
 }
 

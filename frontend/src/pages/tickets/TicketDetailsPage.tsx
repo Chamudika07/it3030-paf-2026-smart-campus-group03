@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchTicketById } from "../../api/ticketApi";
+import { BackButton } from "../../components/common/BackButton";
 import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPreviewGrid";
 import { CommentSection } from "../../components/tickets/CommentSection";
 import { TechnicianUpdatePanel } from "../../components/tickets/TechnicianUpdatePanel";
@@ -65,6 +66,7 @@ export function TicketDetailsPage() {
           <Link to="/tickets/new" className="button-link">
             New Ticket
           </Link>
+          <BackButton label="← Back" fallbackPath="/tickets" />
         </div>
       </div>
 

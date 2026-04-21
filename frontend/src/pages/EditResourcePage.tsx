@@ -1,16 +1,17 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { createResource } from "../api/resourceApi";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchResourceById, updateResource } from "../api/resourceApi";
 import { BackButton } from "../components/common/BackButton";
 import type { ResourceCategory } from "../types/resource";
 
 type FormState = {
+  code: string; // read-only
   location: string;
   category: ResourceCategory;
-  code: string;
   name: string;
   capacity: string;
+  active: boolean;
 };
 
 type FormErrors = {
@@ -69,19 +70,54 @@ const resourceCodesByLocationAndCategory: Record<string, Record<ResourceCategory
 };
 
 const initialForm: FormState = {
+  code: "",
   location: "",
   category: "LECTURE_HALL",
-  code: "",
   name: "",
-  capacity: ""
+  capacity: "",
+  active: true
 };
 
-export function CreateResourcePage() {
+export function EditResourcePage() {
   const navigate = useNavigate();
+  const { resourceId } = useParams<{ resourceId: string }>();
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [originalCode, setOriginalCode] = useState("");
+
+  // Load resource data on mount
+  useEffect(() => {
+    async function loadResource() {
+      if (!resourceId) {
+        setServerError("Resource ID is missing");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const resource = await fetchResourceById(Number(resourceId));
+        setForm({
+          code: resource.code,
+          location: resource.location,
+          category: resource.category,
+          name: resource.name,
+          capacity: String(resource.capacity),
+          active: resource.active
+        });
+        setOriginalCode(resource.code);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to load resource";
+        setServerError(`Could not load resource: ${errorMessage}`);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadResource();
+  }, [resourceId]);
 
   // Get available codes based on selected location and category
   const availableCodes = useMemo(() => {
@@ -100,13 +136,6 @@ export function CreateResourcePage() {
     // Category validation
     if (!form.category) {
       newErrors.category = "Category is required";
-    }
-
-    // Code validation
-    if (!form.code.trim()) {
-      newErrors.code = "Resource code is required";
-    } else if (!availableCodes.includes(form.code.trim())) {
-      newErrors.code = "Selected code is not valid for this location and category";
     }
 
     // Name validation
@@ -136,13 +165,13 @@ export function CreateResourcePage() {
     return Object.keys(newErrors).length === 0;
   }
 
-  function handleInputChange(field: keyof FormState, value: string) {
+  function handleInputChange(field: keyof FormState, value: string | boolean) {
     setForm((prev) => ({
       ...prev,
-      [field]: value
+      [field]: typeof value === "boolean" ? value : value
     }));
-    // Clear error for this field when user starts typing
-    if (errors[field]) {
+    // Clear error for this field when user starts typing (only for string fields)
+    if (typeof value === "string" && errors[field]) {
       setErrors((prev) => ({
         ...prev,
         [field]: undefined
@@ -158,23 +187,42 @@ export function CreateResourcePage() {
       return;
     }
 
+    if (!resourceId) {
+      setServerError("Resource ID is missing");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const payload = {
-        code: form.code.trim(),
         name: form.name.trim(),
         category: form.category,
         location: form.location,
-        capacity: Number(form.capacity)
+        capacity: Number(form.capacity),
+        active: form.active
       };
 
-      const createdResource = await createResource(payload);
+      await updateResource(Number(resourceId), payload);
       navigate(`/resources`);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create resource";
-      setServerError(`Resource creation failed: ${errorMessage}. Please check your data and try again.`);
+      const errorMessage = err instanceof Error ? err.message : "Failed to update resource";
+      setServerError(`Resource update failed: ${errorMessage}. Please check your data and try again.`);
       setSubmitting(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <section className="stack">
+        <div className="page-header">
+          <div>
+            <p className="eyebrow">Member 1 ownership</p>
+            <h2>Edit Resource</h2>
+            <p className="muted-text">Loading resource data...</p>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -182,8 +230,8 @@ export function CreateResourcePage() {
       <div className="page-header">
         <div>
           <p className="eyebrow">Member 1 ownership</p>
-          <h2>Create Resource</h2>
-          <p className="muted-text">Add a new campus facility or asset</p>
+          <h2>Edit Resource</h2>
+          <p className="muted-text">Update campus facility or asset details</p>
         </div>
         <BackButton label="← Back" fallbackPath="/resources" />
       </div>
@@ -195,6 +243,17 @@ export function CreateResourcePage() {
               {serverError}
             </div>
           )}
+
+          {/* Resource Code Field - Read Only */}
+          <div className="form-group">
+            <label htmlFor="code">
+              Resource Code
+            </label>
+            <div className="read-only-field">
+              {form.code}
+            </div>
+            <p className="help-text">Resource code cannot be changed</p>
+          </div>
 
           {/* Location Field */}
           <div className="form-group">
@@ -240,35 +299,6 @@ export function CreateResourcePage() {
             {!form.location && <p className="help-text">Select a location first</p>}
           </div>
 
-          {/* Resource Code Field */}
-          <div className="form-group">
-            <label htmlFor="code">
-              Resource Code <span className="required">*</span>
-            </label>
-            <select
-              id="code"
-              value={form.code}
-              onChange={(e) => handleInputChange("code", e.target.value)}
-              className={errors.code ? "input-error" : ""}
-              disabled={submitting || !form.location}
-            >
-              <option value="">Select a resource code...</option>
-              {availableCodes.length === 0 && form.location && (
-                <option disabled>No codes available for this category</option>
-              )}
-              {availableCodes.map((code) => (
-                <option key={code} value={code}>
-                  {code}
-                </option>
-              ))}
-            </select>
-            {errors.code && <p className="field-error">{errors.code}</p>}
-            {!form.location && <p className="help-text">Select a location first</p>}
-            {form.location && availableCodes.length > 0 && (
-              <p className="help-text">{availableCodes.length} available code(s)</p>
-            )}
-          </div>
-
           {/* Name Field */}
           <div className="form-group">
             <label htmlFor="name">
@@ -306,6 +336,22 @@ export function CreateResourcePage() {
             <p className="help-text">Must be between 1 and 10,000</p>
           </div>
 
+          {/* Status Field */}
+          <div className="form-group">
+            <label htmlFor="active" className="checkbox-label">
+              <input
+                id="active"
+                type="checkbox"
+                checked={form.active}
+                onChange={(e) => handleInputChange("active", e.target.checked)}
+                disabled={submitting}
+                className="checkbox-input"
+              />
+              <span>Active</span>
+            </label>
+            <p className="help-text">Uncheck to disable this resource</p>
+          </div>
+
           {/* Form Actions */}
           <div className="form-actions">
             <button
@@ -313,7 +359,7 @@ export function CreateResourcePage() {
               disabled={submitting}
               className="button button-primary"
             >
-              {submitting ? "Creating..." : "Create Resource"}
+              {submitting ? "Updating..." : "Update Resource"}
             </button>
             <button
               type="button"
@@ -503,6 +549,34 @@ export function CreateResourcePage() {
         .muted-text {
           color: #6b7280;
           margin: 0;
+        }
+
+        .read-only-field {
+          padding: 0.75rem;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.375rem;
+          background-color: #f9fafb;
+          color: #374151;
+          font-weight: 500;
+        }
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-weight: 400;
+          cursor: pointer;
+        }
+
+        .checkbox-input {
+          width: 1.25rem;
+          height: 1.25rem;
+          cursor: pointer;
+        }
+
+        .checkbox-input:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
       `}</style>
     </section>

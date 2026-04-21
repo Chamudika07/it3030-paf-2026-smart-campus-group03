@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTicket } from "../../api/ticketApi";
 import { fetchResources } from "../../api/resourceApi";
+import { BackButton } from "../../components/common/BackButton";
 import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPreviewGrid";
 import {
   ticketCategoryOptions,
@@ -113,6 +114,7 @@ export function CreateTicketPage() {
             Report a maintenance issue with enough context for the operations team to act fast.
           </p>
         </div>
+        <BackButton label="← Back" fallbackPath="/tickets" />
       </div>
 
       <form className="panel stack" onSubmit={handleSubmit}>

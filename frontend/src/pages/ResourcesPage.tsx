@@ -84,12 +84,13 @@ export function ResourcesPage() {
                 <th>Location</th>
                 <th>Capacity</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {resources.length === 0 ? (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     {hasSearched
                       ? "No resources match your search."
                       : "No resources yet. Add your first resource from the backend API."}
@@ -105,6 +106,17 @@ export function ResourcesPage() {
                     <td>{resource.capacity}</td>
                     <td>
                       <ResourceStatusBadge active={resource.active} />
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          onClick={() => navigate(`/resources/${resource.id}/edit`)}
+                          className="action-button edit-button"
+                          title="Edit resource"
+                        >
+                          ✏️ Edit
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -192,6 +204,40 @@ export function ResourcesPage() {
 
         .table tbody tr:hover {
           background-color: #f9fafb;
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .action-button {
+          padding: 0.5rem 0.75rem;
+          border: none;
+          border-radius: 0.25rem;
+          font-size: 0.85rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .edit-button {
+          background-color: #3b82f6;
+          color: white;
+        }
+
+        .edit-button:hover {
+          background-color: #2563eb;
+        }
+
+        .delete-button {
+          background-color: #ef4444;
+          color: white;
+        }
+
+        .delete-button:hover {
+          background-color: #dc2626;
         }
 
         .stack {
