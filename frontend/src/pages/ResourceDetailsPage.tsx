@@ -116,14 +116,14 @@ export function ResourceDetailsPage() {
         <div className="header-actions">
           <button
             onClick={() => navigate(`/resources/${resource.id}/edit`)}
-            className="action-button edit-button"
+            className="button-link"
           >
             ✏️ Edit
           </button>
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="action-button delete-button"
+            className="button-secondary danger-button"
           >
             {deleting ? "Deleting..." : "🗑️ Delete"}
           </button>
