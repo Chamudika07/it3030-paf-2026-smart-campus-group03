@@ -1,23 +1,20 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { assignTechnician, updateTicketStatus } from "../../api/ticketApi";
-import {
-  formatTicketText
-} from "./ticketAppearance";
+import { formatTicketText } from "./ticketAppearance";
 import { TicketBadge } from "./TicketBadge";
 import { ticketStatusOptions, type Ticket, type TicketStatus } from "../../types/ticket";
+import { Badge } from "../ui/Badge";
+import { Button } from "../ui/Button";
+import { Card } from "../ui/Card";
+import { FormField } from "../ui/FormField";
 
 type TechnicianUpdatePanelProps = {
   ticket: Ticket;
-  canManage: boolean;
   onTicketUpdated: (ticket: Ticket) => void;
 };
 
-export function TechnicianUpdatePanel({
-  ticket,
-  canManage,
-  onTicketUpdated
-}: TechnicianUpdatePanelProps) {
+export function TechnicianUpdatePanel({ ticket, onTicketUpdated }: TechnicianUpdatePanelProps) {
   const [assignForm, setAssignForm] = useState({
     technicianIdentifier: ticket.assignedTechnician?.identifier ?? "",
     technicianName: ticket.assignedTechnician?.name ?? "",
@@ -28,6 +25,22 @@ export function TechnicianUpdatePanel({
   const [rejectionReason, setRejectionReason] = useState(ticket.rejectionReason ?? "");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const canAssign = ticket.assignAllowed;
+  const canUpdateStatus = ticket.statusUpdateAllowed;
+
+  useEffect(() => {
+    setAssignForm({
+      technicianIdentifier: ticket.assignedTechnician?.identifier ?? "",
+      technicianName: ticket.assignedTechnician?.name ?? "",
+      technicianEmail: ticket.assignedTechnician?.email ?? ""
+    });
+    setStatus(ticket.status);
+    setResolutionNotes(ticket.resolutionNotes ?? "");
+    setRejectionReason(ticket.rejectionReason ?? "");
+  }, [ticket]);
+
+  const inputClassName =
+    "w-full rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:ring-4 focus:ring-[#DBEAFE] disabled:bg-slate-50 disabled:text-[#94A3B8]";
 
   const allowedStatusOptions = useMemo(() => {
     switch (ticket.status) {
@@ -48,6 +61,10 @@ export function TechnicianUpdatePanel({
 
   async function handleAssign(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canAssign) {
+      return;
+    }
+
     if (!assignForm.technicianIdentifier.trim() || !assignForm.technicianName.trim()) {
       setError("Technician identifier and name are required.");
       return;
@@ -71,6 +88,10 @@ export function TechnicianUpdatePanel({
 
   async function handleStatusUpdate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canUpdateStatus) {
+      return;
+    }
+
     setBusy(true);
     setError("");
     try {
@@ -87,109 +108,192 @@ export function TechnicianUpdatePanel({
     }
   }
 
-  if (!canManage) {
+  if (!canAssign && !canUpdateStatus) {
     return (
-      <section className="panel stack">
-        <div className="section-heading">
-          <h3>Technician Actions</h3>
+      <Card as="section" className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94A3B8]">
+              Operations Controls
+            </p>
+            <h3 className="mt-2 text-lg font-semibold text-[#0F172A]">Operations Controls</h3>
+          </div>
+          <TicketBadge value={ticket.status} kind="status" />
         </div>
-        <p className="muted-text">
+        <p className="max-w-2xl text-sm leading-6 text-[#334155]">
           Only admins can assign a technician. Admins and the assigned technician can move the
           ticket through its workflow.
         </p>
-      </section>
+      </Card>
     );
   }
 
   return (
-    <section className="panel stack">
-      <div className="section-heading">
-        <h3>Technician Actions</h3>
-        <TicketBadge value={ticket.status} kind="status" />
+    <Card as="section" className="space-y-5">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94A3B8]">
+            Operations Controls
+          </p>
+          <h3 className="mt-2 text-lg font-semibold text-[#0F172A]">Operations Controls</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#334155]">
+            Keep assignment details and ticket workflow updates in one structured workspace.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge tone="orange">Priority workflow</Badge>
+          <TicketBadge value={ticket.status} kind="status" />
+        </div>
       </div>
 
-      <form className="stack" onSubmit={handleAssign}>
-        <div className="form-grid">
-          <label className="field-group">
-            <span>Technician ID</span>
-            <input
-              value={assignForm.technicianIdentifier}
-              onChange={(event) =>
-                setAssignForm((current) => ({
-                  ...current,
-                  technicianIdentifier: event.target.value
-                }))
-              }
-            />
-          </label>
-          <label className="field-group">
-            <span>Technician Name</span>
-            <input
-              value={assignForm.technicianName}
-              onChange={(event) =>
-                setAssignForm((current) => ({ ...current, technicianName: event.target.value }))
-              }
-            />
-          </label>
-          <label className="field-group">
-            <span>Technician Email</span>
-            <input
-              type="email"
-              value={assignForm.technicianEmail}
-              onChange={(event) =>
-                setAssignForm((current) => ({ ...current, technicianEmail: event.target.value }))
-              }
-            />
-          </label>
-        </div>
-        <div className="form-actions">
-          <button type="submit" disabled={busy}>
-            {busy ? "Saving..." : "Assign Technician"}
-          </button>
-        </div>
-      </form>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <form
+          className="space-y-5 rounded-2xl border border-[#E2E8F0] bg-slate-50 p-5"
+          onSubmit={handleAssign}
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h4 className="text-base font-semibold text-[#0F172A]">Assignment Details</h4>
+              <p className="mt-1 text-sm leading-6 text-[#334155]">
+                Capture the technician owner clearly so the team can see who is responsible.
+              </p>
+            </div>
+            <Badge tone={canAssign ? "blue" : "neutral"}>
+              {canAssign ? "Editable" : "View only"}
+            </Badge>
+          </div>
 
-      <form className="stack" onSubmit={handleStatusUpdate}>
-        <div className="form-grid">
-          <label className="field-group">
-            <span>Status</span>
-            <select value={status} onChange={(event) => setStatus(event.target.value as TicketStatus)}>
-              {allowedStatusOptions.map((option) => (
-                <option key={option} value={option}>
-                  {formatTicketText(option)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field-group">
-            <span>Resolution Notes</span>
-            <textarea
-              className="field-textarea"
-              rows={4}
-              value={resolutionNotes}
-              onChange={(event) => setResolutionNotes(event.target.value)}
-              placeholder="Required when the ticket is resolved."
-            />
-          </label>
-          <label className="field-group">
-            <span>Rejection Reason</span>
-            <textarea
-              className="field-textarea"
-              rows={4}
-              value={rejectionReason}
-              onChange={(event) => setRejectionReason(event.target.value)}
-              placeholder="Required when the ticket is rejected."
-            />
-          </label>
-        </div>
-        <div className="form-actions">
-          <button type="submit" disabled={busy}>
-            {busy ? "Updating..." : "Update Status"}
-          </button>
-        </div>
-      </form>
+          <div className="grid gap-4 md:grid-cols-2">
+            <FormField label="Technician ID">
+              <input
+                className={inputClassName}
+                value={assignForm.technicianIdentifier}
+                onChange={(event) =>
+                  setAssignForm((current) => ({
+                    ...current,
+                    technicianIdentifier: event.target.value
+                  }))
+                }
+                placeholder="EMP-204"
+                disabled={!canAssign || busy}
+              />
+            </FormField>
+            <FormField label="Technician Name">
+              <input
+                className={inputClassName}
+                value={assignForm.technicianName}
+                onChange={(event) =>
+                  setAssignForm((current) => ({ ...current, technicianName: event.target.value }))
+                }
+                placeholder="Alex Fernando"
+                disabled={!canAssign || busy}
+              />
+            </FormField>
+            <FormField
+              label="Technician Email"
+              hint="Use a campus email when available so communication stays consistent."
+              className="md:col-span-2"
+            >
+              <input
+                className={inputClassName}
+                type="email"
+                value={assignForm.technicianEmail}
+                onChange={(event) =>
+                  setAssignForm((current) => ({ ...current, technicianEmail: event.target.value }))
+                }
+                placeholder="technician@campus.edu"
+                disabled={!canAssign || busy}
+              />
+            </FormField>
+          </div>
 
-      {error && <div className="error-panel panel-inline">{error}</div>}
-    </section>
+          {canAssign && (
+            <div className="flex">
+              <Button type="submit" className="w-full sm:w-auto" disabled={busy}>
+                {busy ? "Saving..." : "Save Technician Assignment"}
+              </Button>
+            </div>
+          )}
+        </form>
+
+        <form
+          className="space-y-5 rounded-2xl border border-[#E2E8F0] bg-slate-50 p-5"
+          onSubmit={handleStatusUpdate}
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h4 className="text-base font-semibold text-[#0F172A]">Workflow Update</h4>
+              <p className="mt-1 text-sm leading-6 text-[#334155]">
+                Update the ticket stage and record a clear outcome before closing or rejecting it.
+              </p>
+            </div>
+            <Badge tone={canUpdateStatus ? "orange" : "neutral"}>
+              {canUpdateStatus ? "Editable" : "View only"}
+            </Badge>
+          </div>
+
+          <div className="grid gap-4">
+            <FormField label="Status">
+              <select
+                className={inputClassName}
+                value={status}
+                onChange={(event) => setStatus(event.target.value as TicketStatus)}
+                disabled={!canUpdateStatus || busy}
+              >
+                {allowedStatusOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {formatTicketText(option)}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+
+            <div className="rounded-2xl bg-[#FFEDD5] p-4">
+              <p className="text-sm font-semibold text-[#EA580C]">Workflow guidance</p>
+              <p className="mt-1 text-sm leading-6 text-[#9A3412]">
+                Add resolution notes for resolved tickets and a rejection reason when work cannot
+                proceed.
+              </p>
+            </div>
+
+            <FormField label="Resolution Notes">
+              <textarea
+                className={inputClassName}
+                rows={4}
+                value={resolutionNotes}
+                onChange={(event) => setResolutionNotes(event.target.value)}
+                placeholder="Explain what was fixed, replaced, or verified."
+                disabled={!canUpdateStatus || busy}
+              />
+            </FormField>
+
+            <FormField label="Rejection Reason">
+              <textarea
+                className={inputClassName}
+                rows={4}
+                value={rejectionReason}
+                onChange={(event) => setRejectionReason(event.target.value)}
+                placeholder="Explain why this request was rejected or cannot continue."
+                disabled={!canUpdateStatus || busy}
+              />
+            </FormField>
+          </div>
+
+          {canUpdateStatus && (
+            <div className="flex">
+              <Button type="submit" variant="accent" className="w-full sm:w-auto" disabled={busy}>
+                {busy ? "Updating..." : "Save Workflow Update"}
+              </Button>
+            </div>
+          )}
+        </form>
+      </div>
+
+      {error && (
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {error}
+        </div>
+      )}
+    </Card>
   );
 }

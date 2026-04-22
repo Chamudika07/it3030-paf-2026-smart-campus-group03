@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { createTicket } from "../../api/ticketApi";
 import { fetchResources } from "../../api/resourceApi";
 import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPreviewGrid";
+import { Button } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
+import { FormField } from "../../components/ui/FormField";
+import { PageHeader } from "../../components/ui/PageHeader";
 import {
   ticketCategoryOptions,
   ticketPriorityOptions,
@@ -69,6 +73,9 @@ export function CreateTicketPage() {
     };
   }, [previews]);
 
+  const inputClassName =
+    "w-full rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:ring-4 focus:ring-[#DBEAFE] disabled:bg-slate-50 disabled:text-[#94A3B8]";
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!form.title.trim() || !form.description.trim() || !form.preferredContact.trim()) {
@@ -104,30 +111,26 @@ export function CreateTicketPage() {
   }
 
   return (
-    <section className="stack">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Member 3 ownership</p>
-          <h2>Create Ticket</h2>
-          <p className="muted-text">
-            Report a maintenance issue with enough context for the operations team to act fast.
-          </p>
-        </div>
-      </div>
+    <section className="space-y-6">
+      <PageHeader
+        eyebrow="Member 3 ownership"
+        title="Create Ticket"
+        description="Report a maintenance issue with enough context for the operations team to act fast."
+      />
 
-      <form className="panel stack" onSubmit={handleSubmit}>
-        <div className="form-grid">
-          <label className="field-group">
-            <span>Title</span>
+      <Card as="form" className="space-y-6" onSubmit={handleSubmit}>
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormField label="Title">
             <input
+              className={inputClassName}
               value={form.title}
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
               placeholder="Air conditioner leaking in Lab 2"
             />
-          </label>
-          <label className="field-group">
-            <span>Category</span>
+          </FormField>
+          <FormField label="Category">
             <select
+              className={inputClassName}
               value={form.category}
               onChange={(event) =>
                 setForm((current) => ({ ...current, category: event.target.value as TicketCategory }))
@@ -139,10 +142,10 @@ export function CreateTicketPage() {
                 </option>
               ))}
             </select>
-          </label>
-          <label className="field-group">
-            <span>Priority</span>
+          </FormField>
+          <FormField label="Priority">
             <select
+              className={inputClassName}
               value={form.priority}
               onChange={(event) =>
                 setForm((current) => ({ ...current, priority: event.target.value as TicketPriority }))
@@ -154,11 +157,23 @@ export function CreateTicketPage() {
                 </option>
               ))}
             </select>
-          </label>
-          <label className="field-group field-group-wide">
-            <span>Description</span>
+          </FormField>
+          <FormField
+            label="Preferred Contact"
+            hint="Use a phone number or campus email so the team can reach you quickly."
+          >
+            <input
+              className={inputClassName}
+              value={form.preferredContact}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, preferredContact: event.target.value }))
+              }
+              placeholder="0771234567 or your campus email"
+            />
+          </FormField>
+          <FormField label="Description" className="md:col-span-2">
             <textarea
-              className="field-textarea"
+              className={inputClassName}
               rows={6}
               value={form.description}
               onChange={(event) =>
@@ -166,30 +181,20 @@ export function CreateTicketPage() {
               }
               placeholder="Describe the issue, impact, and anything already tried."
             />
-          </label>
-          <label className="field-group">
-            <span>Preferred Contact</span>
+          </FormField>
+          <FormField label="Location">
             <input
-              value={form.preferredContact}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, preferredContact: event.target.value }))
-              }
-              placeholder="0771234567 or your campus email"
-            />
-          </label>
-          <label className="field-group">
-            <span>Location</span>
-            <input
+              className={inputClassName}
               value={form.locationText}
               onChange={(event) =>
                 setForm((current) => ({ ...current, locationText: event.target.value }))
               }
               placeholder="Engineering Building, Floor 2, Lab 4"
             />
-          </label>
-          <label className="field-group">
-            <span>Resource Reference</span>
+          </FormField>
+          <FormField label="Resource Reference">
             <select
+              className={inputClassName}
               value={form.resourceId}
               onChange={(event) => setForm((current) => ({ ...current, resourceId: event.target.value }))}
               disabled={loadingResources}
@@ -201,29 +206,35 @@ export function CreateTicketPage() {
                 </option>
               ))}
             </select>
-          </label>
-          <label className="field-group">
-            <span>Images</span>
+          </FormField>
+          <FormField label="Images" hint="Upload up to 3 image files.">
             <input
+              className={inputClassName}
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
               multiple
               onChange={(event) => setFiles(Array.from(event.target.files ?? []).slice(0, 3))}
             />
-            <small>Upload up to 3 images.</small>
-          </label>
+          </FormField>
         </div>
 
         <AttachmentPreviewGrid previews={previews} title="Image Preview" />
 
-        {error && <div className="error-panel panel-inline">{error}</div>}
+        {error && (
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {error}
+          </div>
+        )}
 
-        <div className="form-actions">
-          <button type="submit" disabled={submitting}>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" disabled={submitting}>
             {submitting ? "Submitting..." : "Submit Ticket"}
-          </button>
+          </Button>
+          <Button type="button" variant="secondary" onClick={() => navigate("/tickets")}>
+            Cancel
+          </Button>
         </div>
-      </form>
+      </Card>
     </section>
   );
 }

@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchBookings } from "../api/bookingApi";
 import { BookingBadge } from "../components/bookings/BookingBadge";
+import { Badge } from "../components/ui/Badge";
+import { Button, buttonStyles } from "../components/ui/Button";
+import { DataTable } from "../components/ui/DataTable";
+import { PageHeader } from "../components/ui/PageHeader";
 import { useAuth } from "../hooks/useAuth";
 import type { Booking } from "../types/booking";
 
@@ -18,7 +22,7 @@ export function BookingsPage() {
       try {
         const data = await fetchBookings();
         setBookings(data);
-      } catch (err) {
+      } catch (requestError) {
         setError("Could not load bookings. Make sure the backend is running.");
       } finally {
         setLoading(false);
@@ -29,91 +33,92 @@ export function BookingsPage() {
 
   const displayedBookings =
     filterMode === "MY_BOOKINGS" && user
-      ? bookings.filter((b) => b.userName === user.name) // Using name as simplified userId matching for now
+      ? bookings.filter((booking) => booking.userName === user.name)
       : bookings;
 
   return (
-    <section className="stack">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Member 2 ownership</p>
-          <h2>Bookings</h2>
-          <p className="muted-text">
-            Manage requests for lecture halls, labs, and equipment.
-          </p>
-        </div>
-        <Link to="/bookings/new" className="button-link">
-          New Booking
-        </Link>
-      </div>
+    <section className="space-y-6">
+      <PageHeader
+        eyebrow="Member 2 ownership"
+        title="Bookings"
+        description="Manage requests for lecture halls, labs, and equipment with approval status tracking."
+        actions={
+          <>
+            <Badge tone="orange">{displayedBookings.length} visible</Badge>
+            <Link to="/bookings/new" className={buttonStyles("primary")}>
+              New Booking
+            </Link>
+          </>
+        }
+      />
 
-      <div
-        className="panel"
-        style={{ display: "flex", gap: "1rem", alignItems: "center" }}
-      >
-        <button
-          className={
-            filterMode === "ALL" ? "button" : "button button-secondary"
-          }
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          variant={filterMode === "ALL" ? "primary" : "secondary"}
+          size="sm"
           onClick={() => setFilterMode("ALL")}
         >
           All Bookings
-        </button>
-        <button
-          className={
-            filterMode === "MY_BOOKINGS" ? "button" : "button button-secondary"
-          }
+        </Button>
+        <Button
+          variant={filterMode === "MY_BOOKINGS" ? "primary" : "secondary"}
+          size="sm"
           onClick={() => setFilterMode("MY_BOOKINGS")}
         >
           My Bookings
-        </button>
+        </Button>
       </div>
 
-      {loading && <div className="panel">Loading bookings...</div>}
-      {error && <div className="panel error-panel">{error}</div>}
+      {loading && (
+        <div className="rounded-2xl border border-[#E2E8F0] bg-white px-6 py-5 text-sm text-[#334155] shadow-md shadow-slate-200/50">
+          Loading bookings...
+        </div>
+      )}
+      {error && (
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-5 text-sm text-rose-700">
+          {error}
+        </div>
+      )}
 
       {!loading && !error && (
-        <div className="panel">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Resource</th>
-                <th>Requested By</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Status</th>
-                <th />
+        <DataTable columns={["Resource", "Requested By", "Start Date", "End Date", "Status", "Action"]}>
+          {displayedBookings.length === 0 ? (
+            <tr>
+              <td className="px-6 py-10 text-sm text-[#94A3B8]" colSpan={6}>
+                No bookings found.
+              </td>
+            </tr>
+          ) : (
+            displayedBookings.map((booking, index) => (
+              <tr
+                key={booking.id}
+                className={`transition hover:bg-[#DBEAFE]/35 ${index % 2 === 0 ? "bg-white" : "bg-[#F8FAFC]"}`}
+              >
+                <td className="px-6 py-4 text-sm font-semibold text-[#0F172A]">
+                  {booking.resourceName}
+                </td>
+                <td className="px-6 py-4 text-sm text-[#334155]">{booking.userName}</td>
+                <td className="px-6 py-4 text-sm text-[#334155]">
+                  {new Date(booking.startDate).toLocaleString()}
+                </td>
+                <td className="px-6 py-4 text-sm text-[#334155]">
+                  {new Date(booking.endDate).toLocaleString()}
+                </td>
+                <td className="px-6 py-4">
+                  <BookingBadge status={booking.status} />
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  <Link
+                    to={`/bookings/${booking.id}`}
+                    className="font-semibold text-[#2563EB] transition hover:text-[#1D4ED8]"
+                  >
+                    Manage
+                  </Link>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {displayedBookings.length === 0 ? (
-                <tr>
-                  <td colSpan={6}>No bookings found.</td>
-                </tr>
-              ) : (
-                displayedBookings.map((booking) => (
-                  <tr key={booking.id}>
-                    <td>{booking.resourceName}</td>
-                    <td>{booking.userName}</td>
-                    <td>{new Date(booking.startDate).toLocaleString()}</td>
-                    <td>{new Date(booking.endDate).toLocaleString()}</td>
-                    <td>
-                      <BookingBadge status={booking.status} />
-                    </td>
-                    <td>
-                      <Link
-                        to={`/bookings/${booking.id}`}
-                        className="table-link"
-                      >
-                        Manage
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+            ))
+          )}
+        </DataTable>
       )}
     </section>
   );
