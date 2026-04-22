@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchTicketById } from "../../api/ticketApi";
 import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPreviewGrid";
-import { CommentSection } from "../../components/tickets/CommentSection";
 import { TechnicianUpdatePanel } from "../../components/tickets/TechnicianUpdatePanel";
 import { TicketBadge } from "../../components/tickets/TicketBadge";
 import { buttonStyles } from "../../components/ui/Button";
@@ -138,10 +137,7 @@ export function TicketDetailsPage() {
         <AttachmentPreviewGrid attachments={ticket.attachments} />
       </Card>
 
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
-        <TechnicianUpdatePanel ticket={ticket} onTicketUpdated={setTicket} />
-        <CommentSection ticket={ticket} onTicketUpdated={setTicket} />
-      </div>
+      <TechnicianUpdatePanel ticket={ticket} onTicketUpdated={setTicket} />
     </section>
   );
 }

@@ -6,8 +6,8 @@ import {
   updateTicketComment
 } from "../../api/ticketApi";
 import type { Ticket, TicketComment } from "../../types/ticket";
+import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
-import { Card } from "../ui/Card";
 
 type CommentSectionProps = {
   ticket: Ticket;
@@ -89,28 +89,31 @@ export function CommentSection({ ticket, onTicketUpdated }: CommentSectionProps)
   }
 
   return (
-    <Card as="section" className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-[#0F172A]">Comments</h3>
-          <p className="text-sm text-[#94A3B8]">
+    <section className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm shadow-slate-200/60">
+      <div className="flex flex-col gap-3 border-b border-[#E2E8F0] pb-5 sm:flex-row sm:items-start sm:justify-between">
+        <div className="max-w-xl">
+          <h4 className="text-base font-semibold text-[#0F172A]">Comments</h4>
+          <p className="mt-1 text-sm leading-6 text-[#64748B]">
             Capture discussion, troubleshooting notes, and updates.
           </p>
         </div>
-        <div className="rounded-full bg-[#FFEDD5] px-3 py-1 text-xs font-semibold text-[#EA580C]">
+        <Badge tone="neutral" className="shrink-0">
           {ticket.comments.length} total
-        </div>
+        </Badge>
       </div>
 
-      <form className="space-y-4" onSubmit={handleCreateComment}>
-        <textarea
-          className="min-h-32 w-full rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:ring-4 focus:ring-[#DBEAFE]"
-          rows={4}
-          value={newComment}
-          onChange={(event) => setNewComment(event.target.value)}
-          placeholder="Share an update, ask a question, or add technical notes."
-        />
-        <div className="flex flex-wrap items-center gap-3">
+      <form className="mt-5 space-y-4" onSubmit={handleCreateComment}>
+        <label className="block">
+          <span className="mb-2 block text-sm font-medium text-[#334155]">New comment</span>
+          <textarea
+            className="min-h-28 w-full rounded-xl border border-[#CBD5E1] bg-white px-4 py-3 text-sm leading-6 text-[#0F172A] outline-none transition placeholder:text-[#94A3B8] focus:border-[#2563EB] focus:ring-4 focus:ring-[#DBEAFE]"
+            rows={4}
+            value={newComment}
+            onChange={(event) => setNewComment(event.target.value)}
+            placeholder="Share an update, ask a question, or add technical notes."
+          />
+        </label>
+        <div className="flex justify-end">
           <Button type="submit" disabled={busy}>
             {busy ? "Saving..." : "Add Comment"}
           </Button>
@@ -118,14 +121,14 @@ export function CommentSection({ ticket, onTicketUpdated }: CommentSectionProps)
       </form>
 
       {error && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {error}
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="mt-5 space-y-3">
         {sortedComments.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-[#E2E8F0] bg-slate-50 px-4 py-6 text-sm text-[#94A3B8]">
+          <div className="rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] px-4 py-6 text-sm text-[#64748B]">
             No comments yet. Start the discussion from here.
           </div>
         )}
@@ -135,12 +138,12 @@ export function CommentSection({ ticket, onTicketUpdated }: CommentSectionProps)
           return (
             <article
               key={comment.id}
-              className="space-y-4 rounded-2xl border border-[#E2E8F0] bg-slate-50 p-5"
+              className="space-y-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
+                <div className="min-w-0">
                   <strong className="text-sm font-semibold text-[#0F172A]">{comment.author.name}</strong>
-                  <p className="mt-1 text-xs uppercase tracking-[0.16em] text-[#94A3B8]">
+                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[#94A3B8]">
                     {comment.author.role} • {new Date(comment.updatedAt).toLocaleString()}
                   </p>
                 </div>
@@ -176,7 +179,7 @@ export function CommentSection({ ticket, onTicketUpdated }: CommentSectionProps)
               {isEditing ? (
                 <div className="space-y-4">
                   <textarea
-                    className="min-h-28 w-full rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:ring-4 focus:ring-[#DBEAFE]"
+                    className="min-h-28 w-full rounded-xl border border-[#CBD5E1] bg-white px-4 py-3 text-sm leading-6 text-[#0F172A] outline-none transition focus:border-[#2563EB] focus:ring-4 focus:ring-[#DBEAFE]"
                     rows={4}
                     value={editingContent}
                     onChange={(event) => setEditingContent(event.target.value)}
@@ -205,6 +208,6 @@ export function CommentSection({ ticket, onTicketUpdated }: CommentSectionProps)
           );
         })}
       </div>
-    </Card>
+    </section>
   );
 }
