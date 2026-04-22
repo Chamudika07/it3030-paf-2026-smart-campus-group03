@@ -27,6 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/health", "/error").permitAll()
                         .requestMatchers("/api/resources/**").permitAll()
                         .requestMatchers("/api/tickets", "/api/tickets/**").permitAll()
+                        .requestMatchers("/api/bookings", "/api/bookings/**").permitAll()
                         .requestMatchers("/api/comments", "/api/comments/**").permitAll()
                         .anyRequest().authenticated()
                 )
