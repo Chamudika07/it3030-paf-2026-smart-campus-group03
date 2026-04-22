@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+backend/.env
+frontend/.env
+*.env
+.env.local
+.env.*.local
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Python / FastAPI
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Java / backend
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Coverage / reports
+coverage/
+*.lcov
+
+# Misc
+tmp/
+*.swp
