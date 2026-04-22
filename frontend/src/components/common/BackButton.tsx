@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 type BackButtonProps = {
   label?: string;
-  fallbackPath?: string;
+  fallbackPath?: string | number;
 };
 
 export function BackButton({ label = "← Back", fallbackPath = -1 }: BackButtonProps) {
@@ -17,7 +17,7 @@ export function BackButton({ label = "← Back", fallbackPath = -1 }: BackButton
   };
 
   return (
-    <button onClick={handleClick} className="back-button">
+    <button onClick={handleClick} className="button-secondary">
       {label}
     </button>
   );

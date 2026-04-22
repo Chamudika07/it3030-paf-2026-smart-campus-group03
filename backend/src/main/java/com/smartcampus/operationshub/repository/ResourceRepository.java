@@ -21,9 +21,9 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
     
     // Complex search with multiple filters
     @Query("SELECT r FROM Resource r WHERE " +
-           "(:query IS NULL OR LOWER(r.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.code) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
-           "(:category IS NULL OR r.category = :category) AND " +
-           "(:location IS NULL OR LOWER(r.location) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
+           "(:query = '' OR LOWER(r.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(r.code) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
+           "(cast(:category as string) IS NULL OR r.category = :category) AND " +
+           "(:location = '' OR LOWER(r.location) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
            "(:minCapacity IS NULL OR r.capacity >= :minCapacity) AND " +
            "(:active IS NULL OR r.active = :active) " +
            "ORDER BY r.id DESC")

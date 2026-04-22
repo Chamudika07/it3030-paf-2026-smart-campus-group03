@@ -78,8 +78,10 @@ public class ResourceServiceImpl implements ResourceService {
             String location,
             Integer minCapacity,
             Boolean active) {
+        String safeQuery = query == null ? "" : query;
+        String safeLocation = location == null ? "" : location;
         
-        return resourceRepository.searchResources(query, category, location, minCapacity, active)
+        return resourceRepository.searchResources(safeQuery, category, safeLocation, minCapacity, active)
                 .stream()
                 .map(ResourceMapper::toResponse)
                 .toList();

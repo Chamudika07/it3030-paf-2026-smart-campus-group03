@@ -357,7 +357,7 @@ export function EditResourcePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="button button-primary"
+              className="button-link"
             >
               {submitting ? "Updating..." : "Update Resource"}
             </button>
@@ -365,7 +365,7 @@ export function EditResourcePage() {
               type="button"
               onClick={() => navigate("/resources")}
               disabled={submitting}
-              className="button button-secondary"
+              className="button-secondary"
             >
               Cancel
             </button>
@@ -459,62 +459,7 @@ export function EditResourcePage() {
           border-top: 1px solid #e5e7eb;
         }
 
-        .button {
-          padding: 0.75rem 1.5rem;
-          border: none;
-          border-radius: 0.375rem;
-          font-size: 0.95rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-          flex: 1;
-        }
 
-        .button-primary {
-          background-color: #3b82f6;
-          color: white;
-        }
-
-        .button-primary:hover:not(:disabled) {
-          background-color: #2563eb;
-        }
-
-        .button-secondary {
-          background-color: #e5e7eb;
-          color: #1f2937;
-        }
-
-        .button-secondary:hover:not(:disabled) {
-          background-color: #d1d5db;
-        }
-
-        .button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .back-button {
-          padding: 0.75rem 1.5rem;
-          border: 1px solid #d1d5db;
-          border-radius: 0.375rem;
-          font-size: 0.95rem;
-          font-weight: 600;
-          background-color: #f9fafb;
-          color: #374151;
-          cursor: pointer;
-          transition: all 0.2s;
-          white-space: nowrap;
-          height: fit-content;
-        }
-
-        .back-button:hover {
-          background-color: #e5e7eb;
-          border-color: #9ca3af;
-        }
-
-        .back-button:active {
-          background-color: #d1d5db;
-        }
 
         .stack {
           display: flex;
