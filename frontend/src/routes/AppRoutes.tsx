@@ -8,6 +8,7 @@ import { TicketsPage } from "../pages/TicketsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 import { LoginPage } from "../pages/LoginPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
+import { AccessDeniedPage } from "../pages/AccessDeniedPage";
 import { CreateTicketPage } from "../pages/tickets/CreateTicketPage";
 import { TicketDetailsPage } from "../pages/tickets/TicketDetailsPage";
 
@@ -16,6 +17,10 @@ export function AppRoutes() {
     {
       path: "/login",
       element: <LoginPage />
+    },
+    {
+      path: "/access-denied",
+      element: <AccessDeniedPage />
     },
     {
       path: "/",
@@ -32,7 +37,19 @@ export function AppRoutes() {
         { path: "tickets", element: <TicketsPage /> },
         { path: "tickets/new", element: <CreateTicketPage /> },
         { path: "tickets/:ticketId", element: <TicketDetailsPage /> },
-        { path: "notifications", element: <NotificationsPage /> }
+        { path: "notifications", element: <NotificationsPage /> },
+        {
+          path: "admin",
+          element: (
+            <ProtectedRoute roles={["ADMIN"]}>
+              <section className="panel">
+                <p className="eyebrow">Admin</p>
+                <h2>Administration</h2>
+                <p className="muted-text">Role-protected admin area for future team features.</p>
+              </section>
+            </ProtectedRoute>
+          )
+        }
       ]
     },
     {

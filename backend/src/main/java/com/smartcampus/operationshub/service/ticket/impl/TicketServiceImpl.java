@@ -25,6 +25,7 @@ import com.smartcampus.operationshub.security.ticket.CurrentUser;
 import com.smartcampus.operationshub.security.ticket.CurrentUserProvider;
 import com.smartcampus.operationshub.service.ticket.TicketAttachmentStorageService;
 import com.smartcampus.operationshub.service.ticket.TicketService;
+import com.smartcampus.operationshub.service.NotificationService;
 import com.smartcampus.operationshub.util.ticket.TicketMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class TicketServiceImpl implements TicketService {
     private final ResourceRepository resourceRepository;
     private final TicketAttachmentStorageService ticketAttachmentStorageService;
     private final CurrentUserProvider currentUserProvider;
+    private final NotificationService notificationService;
 
     @Override
     public TicketResponse createTicket(CreateTicketRequest request, List<MultipartFile> attachments) {
@@ -106,7 +108,9 @@ public class TicketServiceImpl implements TicketService {
             ticket.setStatus(TicketStatus.IN_PROGRESS);
         }
 
-        return TicketMapper.toResponse(ticketRepository.save(ticket), currentUser);
+        Ticket savedTicket = ticketRepository.save(ticket);
+        notifyTicketOwnerWhenStatusChanges(savedTicket, currentUser);
+        return TicketMapper.toResponse(savedTicket, currentUser);
     }
 
     @Override
@@ -157,6 +161,7 @@ public class TicketServiceImpl implements TicketService {
 
         Comment savedComment = commentRepository.save(comment);
         ticket.getComments().add(savedComment);
+        notifyTicketOwnerWhenCommentAdded(ticket, currentUser);
         return TicketMapper.toCommentResponse(savedComment, currentUser);
     }
 
@@ -237,6 +242,30 @@ public class TicketServiceImpl implements TicketService {
         return currentUser.getRole() == AppUserRole.TECHNICIAN
                 && ticket.getAssignedTechnicianIdentifier() != null
                 && ticket.getAssignedTechnicianIdentifier().equalsIgnoreCase(currentUser.getIdentifier());
+    }
+
+    private void notifyTicketOwnerWhenStatusChanges(Ticket ticket, CurrentUser currentUser) {
+        if (ticket.getCreatedByIdentifier().equalsIgnoreCase(currentUser.getIdentifier())) {
+            return;
+        }
+
+        notificationService.notifyTicketStatusChangedByIdentifier(
+                ticket.getCreatedByIdentifier(),
+                ticket.getId(),
+                ticket.getStatus().name()
+        );
+    }
+
+    private void notifyTicketOwnerWhenCommentAdded(Ticket ticket, CurrentUser currentUser) {
+        if (ticket.getCreatedByIdentifier().equalsIgnoreCase(currentUser.getIdentifier())) {
+            return;
+        }
+
+        notificationService.notifyNewCommentByIdentifier(
+                ticket.getCreatedByIdentifier(),
+                ticket.getId(),
+                currentUser.getName()
+        );
     }
 
     private void validateStatusTransition(TicketStatus currentStatus, TicketStatus nextStatus) {

@@ -1,9 +1,12 @@
 package com.smartcampus.operationshub.security.ticket;
 
+import com.smartcampus.operationshub.entity.AppUser;
 import com.smartcampus.operationshub.enums.AppUserRole;
+import com.smartcampus.operationshub.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,11 +15,24 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
+@RequiredArgsConstructor
 public class CurrentUserProvider {
+
+    private final AuthService authService;
 
     public CurrentUser getCurrentUser() {
         HttpServletRequest request = getCurrentRequest();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        Optional<AppUser> authenticatedUser = authService.findAuthenticatedUser(authentication);
+        if (authenticatedUser.isPresent()) {
+            AppUser user = authenticatedUser.get();
+            return CurrentUser.builder()
+                    .identifier(user.getEmail())
+                    .name(user.getName())
+                    .role(user.getRole())
+                    .build();
+        }
 
         String identifier = headerValue(request, "X-User-Id")
                 .or(() -> authenticatedName(authentication))
