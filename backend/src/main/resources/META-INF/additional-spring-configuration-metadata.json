@@ -1,0 +1,15 @@
+{
+  "properties": [
+    {
+      "name": "app.cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "Comma-separated list of allowed CORS origins for the frontend."
+    },
+    {
+      "name": "app.storage.ticket-attachments-dir",
+      "type": "java.lang.String",
+      "defaultValue": "uploads/tickets",
+      "description": "Directory used to store ticket attachment files."
+    }
+  ]
+}

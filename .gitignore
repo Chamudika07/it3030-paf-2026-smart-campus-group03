@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env.*.local
+backend/.env
+frontend/.env
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Java / backend
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Coverage / reports
+coverage/
+*.lcov
+
+# Misc
+tmp/
+*.swp
+
+
+config.bat
+node_modules
