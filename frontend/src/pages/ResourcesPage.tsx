@@ -51,8 +51,7 @@ export function ResourcesPage() {
           <p className="muted-text">Manage campus facilities and assets</p>
         </div>
         <div className="topbar-actions">
-          <Link to="/resources/codes" className="button-secondary">📋 Browse Codes</Link>
-          <Link to="/resources/new" className="button-link">+ Create Resource</Link>
+          <Link to="/resources/new" className="button-link">+ Create</Link>
         </div>
       </div>
 

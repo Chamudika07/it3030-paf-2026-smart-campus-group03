@@ -88,10 +88,10 @@ export function ResourceSearchFilter({ onSearch }: ResourceSearchFilterProps) {
         <option value="false">Inactive</option>
       </select>
 
-      <button onClick={handleSearch} className="btn btn-primary">
+      <button onClick={handleSearch} className="button-link">
         Search
       </button>
-      <button onClick={handleClear} className="btn btn-secondary">
+      <button onClick={handleClear} className="button-secondary">
         Clear
       </button>
     </div>
