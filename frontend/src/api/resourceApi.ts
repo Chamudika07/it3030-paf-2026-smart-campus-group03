@@ -54,3 +54,7 @@ export async function updateResource(id: number, payload: UpdateResourcePayload)
   return response.data.data;
 }
 
+export async function deleteResource(id: number) {
+  await http.delete(`/resources/${id}`);
+}
+

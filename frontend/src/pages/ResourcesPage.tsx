@@ -110,11 +110,11 @@ export function ResourcesPage() {
                     <td>
                       <div className="action-buttons">
                         <button
-                          onClick={() => navigate(`/resources/${resource.id}/edit`)}
-                          className="action-button edit-button"
-                          title="Edit resource"
+                          onClick={() => navigate(`/resources/${resource.id}`)}
+                          className="action-button view-button"
+                          title="View resource details"
                         >
-                          ✏️ Edit
+                          👁️ View
                         </button>
                       </div>
                     </td>
@@ -220,6 +220,15 @@ export function ResourcesPage() {
           cursor: pointer;
           transition: all 0.2s;
           white-space: nowrap;
+        }
+
+        .view-button {
+          background-color: #3b82f6;
+          color: white;
+        }
+
+        .view-button:hover {
+          background-color: #2563eb;
         }
 
         .edit-button {

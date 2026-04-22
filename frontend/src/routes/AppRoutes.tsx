@@ -5,6 +5,7 @@ import { DashboardPage } from "../pages/DashboardPage";
 import { ResourcesPage } from "../pages/ResourcesPage";
 import { CreateResourcePage } from "../pages/CreateResourcePage";
 import { EditResourcePage } from "../pages/EditResourcePage";
+import { ResourceDetailsPage } from "../pages/ResourceDetailsPage";
 import { ResourceCodeBrowser } from "../pages/ResourceCodeBrowser";
 import { BookingsPage } from "../pages/BookingsPage";
 import { TicketsPage } from "../pages/TicketsPage";
@@ -32,8 +33,9 @@ export function AppRoutes() {
         { path: "dashboard", element: <DashboardPage /> },
         { path: "resources", element: <ResourcesPage /> },
         { path: "resources/new", element: <CreateResourcePage /> },
-        { path: "resources/:resourceId/edit", element: <EditResourcePage /> },
         { path: "resources/codes", element: <ResourceCodeBrowser /> },
+        { path: "resources/:resourceId/edit", element: <EditResourcePage /> },
+        { path: "resources/:resourceId", element: <ResourceDetailsPage /> },
         { path: "bookings", element: <BookingsPage /> },
         { path: "tickets", element: <TicketsPage /> },
         { path: "tickets/new", element: <CreateTicketPage /> },
