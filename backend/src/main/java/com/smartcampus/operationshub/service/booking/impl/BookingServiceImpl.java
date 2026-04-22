@@ -33,7 +33,12 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponse createBooking(CreateBookingRequest request) {
         CurrentUser currentUser = currentUserProvider.getCurrentUser();
 
-        Resource resource = resourceRepository.findById(request.getResourceId())
+        Long resourceId = request.getResourceId();
+        if (resourceId == null) {
+            throw new BadRequestException("Resource ID is required");
+        }
+
+        Resource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
         if (request.getStartDate().isAfter(request.getEndDate()) || request.getStartDate().isEqual(request.getEndDate())) {
@@ -55,6 +60,7 @@ public class BookingServiceImpl implements BookingService {
                 .status(BookingStatus.PENDING)
                 .build();
 
+        @SuppressWarnings("null")
         Booking savedBooking = bookingRepository.save(booking);
         return mapToResponse(savedBooking);
     }
