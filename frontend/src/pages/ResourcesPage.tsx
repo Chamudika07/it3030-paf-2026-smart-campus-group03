@@ -105,7 +105,7 @@ export function ResourcesPage() {
                     <td>{resource.location}</td>
                     <td>{resource.capacity}</td>
                     <td>
-                      <ResourceStatusBadge active={resource.active} />
+                      <ResourceStatusBadge active={resource.active} size="sm" />
                     </td>
                     <td>
                       <div className="action-buttons">

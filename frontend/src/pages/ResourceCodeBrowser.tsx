@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchResources } from "../api/resourceApi";
 import { BackButton } from "../components/common/BackButton";
+import { ResourceStatusBadge } from "../components/resources/ResourceStatusBadge";
 import type { Resource, ResourceCategory } from "../types/resource";
 
 export function ResourceCodeBrowser() {
@@ -123,9 +124,7 @@ export function ResourceCodeBrowser() {
                   </div>
                 </div>
                 <div className="resource-status">
-                  <span className={`badge ${resource.active ? "badge-active" : "badge-inactive"}`}>
-                    {resource.active ? "Active" : "Inactive"}
-                  </span>
+                  <ResourceStatusBadge active={resource.active} size="sm" />
                 </div>
               </div>
             ))}

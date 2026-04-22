@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchResourceById, deleteResource } from "../api/resourceApi";
 import { BackButton } from "../components/common/BackButton";
+import { ResourceStatusBadge } from "../components/resources/ResourceStatusBadge";
 import type { Resource, ResourceCategory } from "../types/resource";
 
 const locationLabels: Record<string, string> = {
@@ -166,9 +167,7 @@ export function ResourceDetailsPage() {
           <div className="detail-item">
             <label className="detail-label">Status</label>
             <p className="detail-value">
-              <span className={`status-badge ${resource.active ? "status-active" : "status-inactive"}`}>
-                {resource.active ? "Active" : "Inactive"}
-              </span>
+              <ResourceStatusBadge active={resource.active} size="lg" />
             </p>
           </div>
         </div>
