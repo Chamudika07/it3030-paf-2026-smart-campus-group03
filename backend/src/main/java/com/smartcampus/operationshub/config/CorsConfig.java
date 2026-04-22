@@ -13,13 +13,11 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(AppProperties appProperties) {
         CorsConfiguration configuration = new CorsConfiguration();
-        String allowedOrigins = appProperties.getCors() == null
-                ? null
-                : appProperties.getCors().getAllowedOrigins();
+        // Allow both common Vite dev ports so local dev always works
         configuration.setAllowedOrigins(List.of(
-                allowedOrigins == null || allowedOrigins.isBlank()
-                        ? "http://localhost:5173"
-                        : allowedOrigins
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://localhost:5175"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
