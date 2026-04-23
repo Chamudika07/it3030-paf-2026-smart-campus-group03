@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createBooking } from "../../api/bookingApi";
+import { Button, Card, FormField, PageHeader } from "../../components/ui";
+import { checkBookingAvailability, createBooking } from "../../api/bookingApi";
 import { fetchResources } from "../../api/resourceApi";
 import type { Resource } from "../../types/resource";
 
@@ -51,50 +52,102 @@ export function CreateBookingPage() {
     setSubmitting(true);
     setError("");
 
+    const now = new Date();
+    const start = new Date(formData.startDate);
+    const end = new Date(formData.endDate);
+
+    if (start < now) {
+      setError("Booking start time cannot be in the past.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (end <= start) {
+      setError("End time must be after the start time.");
+      setSubmitting(false);
+      return;
+    }
+
+    const selectedResource = resources.find(
+      (r) => r.id === Number(formData.resourceId),
+    );
+    if (
+      selectedResource &&
+      formData.expectedAttendees > selectedResource.capacity
+    ) {
+      setError(
+        `Expected attendees (${formData.expectedAttendees}) exceeds resource capacity (${selectedResource.capacity}).`,
+      );
+      setSubmitting(false);
+      return;
+    }
+
     try {
+      const availability = await checkBookingAvailability(
+        Number(formData.resourceId),
+        formData.startDate,
+        formData.endDate,
+      );
+      if (!availability.available) {
+        setError(
+          availability.message ||
+            "The selected time slot is not available for this resource.",
+        );
+        setSubmitting(false);
+        return;
+      }
+
       await createBooking({
         ...formData,
         resourceId: Number(formData.resourceId),
       });
       navigate("/bookings");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create booking.");
+      if (err.response?.data?.validationErrors) {
+        const errors = Object.values(err.response.data.validationErrors).join(
+          " | ",
+        );
+        setError(errors);
+      } else {
+        setError(err.response?.data?.message || "Failed to create booking.");
+      }
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <section className="stack">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Bookings</p>
-          <h2>New Booking Request</h2>
-          <p className="muted-text">
-            Reserve a facility or asset for your needs.
-          </p>
-        </div>
-        <Link to="/bookings" className="button button-secondary">
-          Cancel
-        </Link>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Bookings"
+        title="New Booking Request"
+        description="Reserve a facility or asset for your needs."
+        actions={
+          <Link to="/bookings">
+            <Button variant="secondary">Cancel</Button>
+          </Link>
+        }
+      />
 
-      <div className="panel">
+      <Card as="form" onSubmit={handleSubmit}>
         {error && (
-          <div className="error-panel" style={{ marginBottom: "1rem" }}>
+          <div
+            className="mb-4 rounded-lg bg-red-100 p-4 text-sm text-red-700"
+            role="alert"
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="form-stack">
-          <div className="form-group">
-            <label htmlFor="resourceId">Resource</label>
+        <div className="space-y-6">
+          <FormField label="Resource">
             <select
               id="resourceId"
               name="resourceId"
               value={formData.resourceId}
               onChange={handleChange}
               required
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
             >
               <option value="">Select a resource</option>
               {resources.map((r) => (
@@ -103,35 +156,39 @@ export function CreateBookingPage() {
                 </option>
               ))}
             </select>
-            {loadingResources && <small>Loading resources...</small>}
+            {loadingResources && (
+              <p className="mt-1 text-xs text-slate-500">
+                Loading resources...
+              </p>
+            )}
+          </FormField>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <FormField label="Start Date & Time">
+              <input
+                type="datetime-local"
+                id="startDate"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+              />
+            </FormField>
+            <FormField label="End Date & Time">
+              <input
+                type="datetime-local"
+                id="endDate"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+              />
+            </FormField>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="startDate">Start Date & Time</label>
-            <input
-              type="datetime-local"
-              id="startDate"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="endDate">End Date & Time</label>
-            <input
-              type="datetime-local"
-              id="endDate"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="purpose">Purpose</label>
+          <FormField label="Purpose">
             <textarea
               id="purpose"
               name="purpose"
@@ -140,11 +197,11 @@ export function CreateBookingPage() {
               rows={4}
               required
               placeholder="Why do you need this resource?"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
             />
-          </div>
+          </FormField>
 
-          <div className="form-group">
-            <label htmlFor="expectedAttendees">Expected Attendees</label>
+          <FormField label="Expected Attendees">
             <input
               type="number"
               id="expectedAttendees"
@@ -153,14 +210,17 @@ export function CreateBookingPage() {
               onChange={handleChange}
               min={1}
               required
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
             />
-          </div>
+          </FormField>
 
-          <button type="submit" className="button" disabled={submitting}>
-            {submitting ? "Submitting..." : "Submit Request"}
-          </button>
-        </form>
-      </div>
-    </section>
+          <div className="flex justify-end">
+            <Button type="submit" disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit Request"}
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }
