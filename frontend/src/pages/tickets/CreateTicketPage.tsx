@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTicket } from "../../api/ticketApi";
 import { fetchResources } from "../../api/resourceApi";
+import { BackButton } from "../../components/common/BackButton";
 import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPreviewGrid";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
@@ -116,6 +117,7 @@ export function CreateTicketPage() {
         eyebrow="Member 3 ownership"
         title="Create Ticket"
         description="Report a maintenance issue with enough context for the operations team to act fast."
+        actions={<BackButton label="← Back" fallbackPath="/tickets" />}
       />
 
       <Card as="form" className="space-y-6" onSubmit={handleSubmit}>

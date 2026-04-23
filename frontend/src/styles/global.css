@@ -1,27 +1,522 @@
 @import "tailwindcss";
 
-@layer base {
-  * {
-    box-sizing: border-box;
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.2rem;
+  background: #0d9488;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #c7d7df;
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: #10212f;
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  padding: 2rem 1.25rem;
+  background: #0f2a3d;
+  color: #f3fbff;
+}
+
+.brand-kicker,
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5bc0be;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 2rem;
+}
+
+.nav-link {
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  color: #d4e8ef;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  background: rgba(91, 192, 190, 0.15);
+  color: #ffffff;
+}
+
+.app-content {
+  padding: 1.5rem;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.topbar h1,
+.hero-card h2,
+.page-header h2,
+.panel h2,
+.auth-card h1 {
+  margin: 0;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.header-actions,
+.form-actions,
+.comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.page-content,
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-card,
+.panel,
+.stat-card,
+.auth-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 33, 47, 0.08);
+  border-radius: 24px;
+  padding: 1.25rem;
+  box-shadow: 0 20px 50px rgba(15, 42, 61, 0.08);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.stat-card h3 {
+  margin: 0.3rem 0;
+  font-size: 2rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid #d7e2ea;
+}
+
+.error-panel {
+  color: #b42318;
+}
+
+.panel-inline {
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  background: rgba(180, 35, 24, 0.08);
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.auth-card {
+  max-width: 520px;
+}
+
+.button-link,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.75rem 1.15rem;
+  font-weight: 600;
+}
+
+.button-link {
+  background: #0d9488;
+  color: #fff;
+}
+
+.button-secondary {
+  background: transparent;
+  color: #0f2a3d;
+  border: 1px solid rgba(16, 33, 47, 0.14);
+}
+
+.danger-button {
+  color: #b42318;
+  border-color: rgba(180, 35, 24, 0.18);
+}
+
+.page-header,
+.section-heading,
+.detail-grid,
+.ticket-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+.page-header {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.section-heading {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.form-grid,
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.field-group {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field-group span,
+.detail-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #557182;
+}
+
+.field-group-wide {
+  grid-column: 1 / -1;
+}
+
+.field-textarea {
+  resize: vertical;
+}
+
+.muted-text {
+  margin: 0;
+  color: #557182;
+}
+
+.empty-state {
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(91, 192, 190, 0.09);
+  color: #245767;
+}
+
+.ticket-layout {
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
+  align-items: start;
+}
+
+.ticket-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.priority-low {
+  color: #0a6847;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.priority-medium {
+  color: #8b5e00;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.priority-high {
+  color: #b45309;
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.priority-critical {
+  color: #b42318;
+  background: rgba(220, 38, 38, 0.14);
+}
+
+.status-open {
+  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.status-progress {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.status-resolved {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.status-closed {
+  color: #0f766e;
+  background: rgba(13, 148, 136, 0.12);
+}
+
+.status-rejected {
+  color: #b42318;
+  background: rgba(220, 38, 38, 0.14);
+}
+
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.attachment-card {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  border-radius: 18px;
+  background: rgba(15, 42, 61, 0.04);
+  border: 1px solid rgba(16, 33, 47, 0.08);
+}
+
+.attachment-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  word-break: break-word;
+}
+
+.attachment-thumb {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: #d9e5eb;
+}
+
+.comment-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(16, 33, 47, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.comment-header p,
+.comment-body,
+.ticket-description {
+  margin: 0;
+}
+
+.comment-body,
+.ticket-description {
+  color: #244353;
+  white-space: pre-wrap;
+}
+
+.info-callout {
+  padding: 1rem;
+  border-radius: 18px;
+}
+
+.resolved-callout {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.rejected-callout {
+  background: rgba(220, 38, 38, 0.09);
+}
+
+.table-link {
+  color: #0d9488;
+  font-weight: 700;
+}
+
+/* Search Filter Styles */
+.search-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 33, 47, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(15, 42, 61, 0.08);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-input,
+.filter-select {
+  min-width: 140px;
+  max-width: 180px;
+}
+
+.search-filter button {
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: #0d9488;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0b7a70;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #0f2a3d;
+  border: 1px solid rgba(16, 33, 47, 0.14);
+}
+
+.btn-secondary:hover {
+  background: rgba(16, 33, 47, 0.05);
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-active {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.badge-inactive {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: 1fr;
   }
 
-  html,
-  body,
-  #root {
-    min-height: 100%;
+  .sidebar {
+    padding-bottom: 1rem;
   }
 
-  body {
-    margin: 0;
-    min-width: 320px;
-    background: #f8fafc;
-    color: #0f172a;
-    font-family:
-      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  .page-header,
+  .section-heading,
+  .detail-grid,
+  .ticket-layout,
+  .form-grid {
+    grid-template-columns: 1fr;
   }
+}
 
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background: #f8fafc;
+  color: #0f172a;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.search-filter {
+  flex-direction: column;
+}
+
+.search-input,
+.filter-input,
+.filter-select,
+.search-filter button {
+  width: 100%;
+  max-width: 100%;
 }

@@ -3,6 +3,10 @@ import { DashboardLayout } from "../layouts/DashboardLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { DashboardPage } from "../pages/DashboardPage";
 import { ResourcesPage } from "../pages/ResourcesPage";
+import { CreateResourcePage } from "../pages/CreateResourcePage";
+import { EditResourcePage } from "../pages/EditResourcePage";
+import { ResourceDetailsPage } from "../pages/ResourceDetailsPage";
+import { ResourceCodeBrowser } from "../pages/ResourceCodeBrowser";
 import { BookingsPage } from "../pages/BookingsPage";
 import { CreateBookingPage } from "../pages/bookings/CreateBookingPage";
 import { BookingDetailsPage } from "../pages/bookings/BookingDetailsPage";
@@ -30,6 +34,10 @@ export function AppRoutes() {
         { index: true, element: <Navigate to="/dashboard" replace /> },
         { path: "dashboard", element: <DashboardPage /> },
         { path: "resources", element: <ResourcesPage /> },
+        { path: "resources/new", element: <CreateResourcePage /> },
+        { path: "resources/codes", element: <ResourceCodeBrowser /> },
+        { path: "resources/:resourceId/edit", element: <EditResourcePage /> },
+        { path: "resources/:resourceId", element: <ResourceDetailsPage /> },
         { path: "bookings", element: <BookingsPage /> },
         { path: "bookings/new", element: <CreateBookingPage /> },
         { path: "bookings/:bookingId", element: <BookingDetailsPage /> },
