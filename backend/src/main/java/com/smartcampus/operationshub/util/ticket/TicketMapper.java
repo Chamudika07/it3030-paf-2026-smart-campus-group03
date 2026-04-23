@@ -9,7 +9,6 @@ import com.smartcampus.operationshub.entity.ticket.Comment;
 import com.smartcampus.operationshub.entity.ticket.Ticket;
 import com.smartcampus.operationshub.entity.ticket.TicketAttachment;
 import com.smartcampus.operationshub.security.ticket.CurrentUser;
-import java.util.List;
 
 public final class TicketMapper {
 

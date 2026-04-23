@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchTicketById } from "../../api/ticketApi";
+import { BackButton } from "../../components/common/BackButton";
 import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPreviewGrid";
 import { TechnicianUpdatePanel } from "../../components/tickets/TechnicianUpdatePanel";
 import { TicketBadge } from "../../components/tickets/TicketBadge";

@@ -1,5 +1,6 @@
 package com.smartcampus.operationshub.config;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,17 +11,28 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class CorsConfig {
 
+    private static final List<String> DEFAULT_ALLOWED_ORIGINS = List.of(
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5175",
+            "http://localhost:5176",
+            "http://localhost:5177"
+    );
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource(AppProperties appProperties) {
         CorsConfiguration configuration = new CorsConfiguration();
         String allowedOrigins = appProperties.getCors() == null
                 ? null
                 : appProperties.getCors().getAllowedOrigins();
-        configuration.setAllowedOrigins(List.of(
+        configuration.setAllowedOrigins(
                 allowedOrigins == null || allowedOrigins.isBlank()
-                        ? "http://localhost:5173"
-                        : allowedOrigins
-        ));
+                        ? DEFAULT_ALLOWED_ORIGINS
+                        : Arrays.stream(allowedOrigins.split(","))
+                                .map(String::trim)
+                                .filter(origin -> !origin.isBlank())
+                                .toList()
+        );
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

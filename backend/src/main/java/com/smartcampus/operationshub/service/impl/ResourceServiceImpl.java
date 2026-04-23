@@ -4,12 +4,14 @@ import com.smartcampus.operationshub.dto.request.CreateResourceRequest;
 import com.smartcampus.operationshub.dto.request.UpdateResourceRequest;
 import com.smartcampus.operationshub.dto.response.ResourceResponse;
 import com.smartcampus.operationshub.entity.Resource;
+import com.smartcampus.operationshub.enums.ResourceCategory;
 import com.smartcampus.operationshub.exception.DuplicateResourceException;
 import com.smartcampus.operationshub.exception.ResourceNotFoundException;
 import com.smartcampus.operationshub.repository.ResourceRepository;
 import com.smartcampus.operationshub.service.ResourceService;
 import com.smartcampus.operationshub.util.ResourceMapper;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +29,12 @@ public class ResourceServiceImpl implements ResourceService {
             throw new DuplicateResourceException("Resource code already exists: " + request.getCode());
         }
 
-        Resource resource = ResourceMapper.toEntity(request);
-        return ResourceMapper.toResponse(resourceRepository.save(resource));
+        Resource resource = Objects.requireNonNull(
+                ResourceMapper.toEntity(request),
+                "Mapped resource must not be null"
+        );
+        Resource savedResource = resourceRepository.save(resource);
+        return ResourceMapper.toResponse(savedResource);
     }
 
     @Override
@@ -43,14 +49,16 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     @Transactional(readOnly = true)
     public ResourceResponse getResourceById(Long id) {
-        Resource resource = resourceRepository.findById(id)
+        Long safeId = Objects.requireNonNull(id, "Resource id must not be null");
+        Resource resource = resourceRepository.findById(safeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
         return ResourceMapper.toResponse(resource);
     }
 
     @Override
     public ResourceResponse updateResource(Long id, UpdateResourceRequest request) {
-        Resource resource = resourceRepository.findById(id)
+        Long safeId = Objects.requireNonNull(id, "Resource id must not be null");
+        Resource resource = resourceRepository.findById(safeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
 
         resource.setName(request.getName());
@@ -64,9 +72,27 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void deleteResource(Long id) {
-        Resource resource = resourceRepository.findById(id)
+        Long safeId = Objects.requireNonNull(id, "Resource id must not be null");
+        Resource resource = resourceRepository.findById(safeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
-        resourceRepository.delete(resource);
+        resourceRepository.delete(Objects.requireNonNull(resource, "Resource to delete must not be null"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ResourceResponse> searchResources(
+            String query,
+            ResourceCategory category,
+            String location,
+            Integer minCapacity,
+            Boolean active) {
+        String safeQuery = query == null ? "" : query;
+        String safeLocation = location == null ? "" : location;
+        
+        return resourceRepository.searchResources(safeQuery, category, safeLocation, minCapacity, active)
+                .stream()
+                .map(ResourceMapper::toResponse)
+                .toList();
     }
 }
 

@@ -1,11 +1,18 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { fetchResources } from "../api/resourceApi";
 import { StatCard } from "../components/common/StatCard";
 import { Badge } from "../components/ui/Badge";
 import { Button, buttonStyles } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { PageHeader } from "../components/ui/PageHeader";
-import { Link } from "react-router-dom";
 
 export function DashboardPage() {
+  const [resourceCount, setResourceCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchResources().then((data) => setResourceCount(data.length)).catch(() => setResourceCount(0));
+  }, []);
   return (
     <section className="space-y-6">
       <PageHeader
@@ -21,6 +28,18 @@ export function DashboardPage() {
           </>
         }
       />
+
+      <div className="card-grid">
+        <Link to="/resources" style={{ textDecoration: "none", color: "inherit" }}>
+          <StatCard
+            label="Resources"
+            value={resourceCount === null ? "..." : resourceCount.toString()}
+            helper="Total resources tracked"
+          />
+        </Link>
+        <StatCard label="Pending Bookings" value="04" helper="Approval queue" />
+        <StatCard label="Open Tickets" value="07" helper="Needs technician review" />
+      </div>
 
       <Card className="relative overflow-hidden bg-gradient-to-br from-white via-white to-[#DBEAFE]/50">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
@@ -65,12 +84,6 @@ export function DashboardPage() {
           </div>
         </div>
       </Card>
-
-      <div className="grid gap-4 xl:grid-cols-3">
-        <StatCard label="Resources" value="12" helper="Sample seeded later" />
-        <StatCard label="Pending Bookings" value="04" helper="Approval queue" />
-        <StatCard label="Open Tickets" value="07" helper="Needs technician review" />
-      </div>
     </section>
   );
 }
