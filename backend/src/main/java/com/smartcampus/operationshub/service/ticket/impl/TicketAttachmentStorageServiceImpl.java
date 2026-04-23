@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.core.io.Resource;
@@ -72,7 +73,14 @@ public class TicketAttachmentStorageServiceImpl implements TicketAttachmentStora
 
             TicketAttachment attachment = new TicketAttachment();
             attachment.setTicket(ticket);
-            attachment.setOriginalFileName(StringUtils.cleanPath(file.getOriginalFilename()));
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.isBlank()) {
+                originalFileName = "attachment";
+            }
+                attachment.setOriginalFileName(Objects.requireNonNull(
+                    StringUtils.cleanPath(originalFileName),
+                    "Original file name must not be null"
+                ));
             attachment.setStoredFileName(storedFileName);
             attachment.setFilePath(targetLocation.toString());
             attachment.setFileType(file.getContentType());
@@ -87,7 +95,7 @@ public class TicketAttachmentStorageServiceImpl implements TicketAttachmentStora
     public Resource loadAsResource(TicketAttachment attachment) {
         try {
             Path filePath = Paths.get(attachment.getFilePath()).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
+            Resource resource = new UrlResource(Objects.requireNonNull(filePath.toUri(), "Attachment URI must not be null"));
             if (!resource.exists() || !resource.isReadable()) {
                 throw new FileStorageException("Attachment file could not be read");
             }

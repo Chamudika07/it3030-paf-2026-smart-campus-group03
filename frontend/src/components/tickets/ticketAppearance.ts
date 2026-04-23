@@ -1,18 +1,18 @@
 import type { TicketPriority, TicketStatus } from "../../types/ticket";
 
 export const priorityTone: Record<TicketPriority, string> = {
-  LOW: "priority-low",
-  MEDIUM: "priority-medium",
-  HIGH: "priority-high",
-  CRITICAL: "priority-critical"
+  LOW: "bg-emerald-100 text-emerald-700",
+  MEDIUM: "bg-[#DBEAFE] text-[#1D4ED8]",
+  HIGH: "bg-[#FFEDD5] text-[#EA580C]",
+  CRITICAL: "bg-rose-100 text-rose-700"
 };
 
 export const statusTone: Record<TicketStatus, string> = {
-  OPEN: "status-open",
-  IN_PROGRESS: "status-progress",
-  RESOLVED: "status-resolved",
-  CLOSED: "status-closed",
-  REJECTED: "status-rejected"
+  OPEN: "bg-[#DBEAFE] text-[#1D4ED8]",
+  IN_PROGRESS: "bg-indigo-100 text-indigo-700",
+  RESOLVED: "bg-emerald-100 text-emerald-700",
+  CLOSED: "bg-slate-100 text-[#334155]",
+  REJECTED: "bg-rose-100 text-rose-700"
 };
 
 export function formatTicketText(value: string) {

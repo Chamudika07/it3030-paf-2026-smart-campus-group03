@@ -27,6 +27,7 @@ import com.smartcampus.operationshub.service.ticket.TicketAttachmentStorageServi
 import com.smartcampus.operationshub.service.ticket.TicketService;
 import com.smartcampus.operationshub.util.ticket.TicketMapper;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -200,17 +201,20 @@ public class TicketServiceImpl implements TicketService {
     }
 
     private Ticket getTicketEntity(Long id) {
-        return ticketRepository.findById(id)
+        Long safeId = Objects.requireNonNull(id, "Ticket id must not be null");
+        return ticketRepository.findById(safeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + id));
     }
 
     private Comment getCommentEntity(Long id) {
-        return commentRepository.findById(id)
+        Long safeId = Objects.requireNonNull(id, "Comment id must not be null");
+        return commentRepository.findById(safeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + id));
     }
 
     private TicketAttachment getAttachmentEntity(Long id) {
-        return ticketAttachmentRepository.findById(id)
+        Long safeId = Objects.requireNonNull(id, "Attachment id must not be null");
+        return ticketAttachmentRepository.findById(safeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Attachment not found with id: " + id));
     }
 

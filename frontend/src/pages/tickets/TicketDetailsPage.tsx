@@ -6,12 +6,13 @@ import { AttachmentPreviewGrid } from "../../components/tickets/AttachmentPrevie
 import { CommentSection } from "../../components/tickets/CommentSection";
 import { TechnicianUpdatePanel } from "../../components/tickets/TechnicianUpdatePanel";
 import { TicketBadge } from "../../components/tickets/TicketBadge";
-import { useAuth } from "../../hooks/useAuth";
+import { buttonStyles } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
+import { PageHeader } from "../../components/ui/PageHeader";
 import type { Ticket } from "../../types/ticket";
 
 export function TicketDetailsPage() {
   const { ticketId } = useParams();
-  const { user } = useAuth();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -38,93 +39,109 @@ export function TicketDetailsPage() {
   }, [ticketId]);
 
   if (loading) {
-    return <section className="panel">Loading ticket details...</section>;
+    return (
+      <section className="rounded-2xl border border-[#E2E8F0] bg-white px-6 py-5 text-sm text-[#334155] shadow-md shadow-slate-200/50">
+        Loading ticket details...
+      </section>
+    );
   }
 
   if (error || !ticket) {
-    return <section className="panel error-panel">{error || "Ticket not found."}</section>;
+    return (
+      <section className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-5 text-sm text-rose-700">
+        {error || "Ticket not found."}
+      </section>
+    );
   }
 
-  const canManage =
-    user?.role === "ADMIN" ||
-    (user?.role === "TECHNICIAN" &&
-      user.name.toLowerCase().replace(/\s+/g, "-") === ticket.assignedTechnician?.identifier);
-
   return (
-    <section className="stack">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Member 3 ownership</p>
-          <h2>{ticket.title}</h2>
-          <p className="muted-text">
-            Created by {ticket.createdBy.name} on {new Date(ticket.createdAt).toLocaleString()}
+    <section className="space-y-6">
+      <PageHeader
+        eyebrow="Member 3 ownership"
+        title={ticket.title}
+        description={`Created by ${ticket.createdBy.name} on ${new Date(ticket.createdAt).toLocaleString()}`}
+        actions={
+          <>
+            <TicketBadge value={ticket.priority} kind="priority" />
+            <TicketBadge value={ticket.status} kind="status" />
+            <Link to="/tickets/new" className={buttonStyles("primary")}>
+              New Ticket
+            </Link>
+          </>
+        }
+      />
+
+      <Card as="section" className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Category
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">{ticket.category}</strong>
+          </div>
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Preferred Contact
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">{ticket.preferredContact}</strong>
+          </div>
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Location
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">
+              {ticket.locationText || "Not provided"}
+            </strong>
+          </div>
+          <div className="rounded-2xl bg-[#F8FAFC] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Resource
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">
+              {ticket.resourceName || "No linked resource"}
+            </strong>
+          </div>
+          <div className="rounded-2xl bg-[#F8FAFC] p-4 md:col-span-2 xl:col-span-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+              Assigned Technician
+            </p>
+            <strong className="mt-2 block text-base text-[#0F172A]">
+              {ticket.assignedTechnician?.name || "Not assigned yet"}
+            </strong>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94A3B8]">
+            Description
           </p>
+          <p className="whitespace-pre-wrap text-sm leading-7 text-[#334155]">{ticket.description}</p>
         </div>
-        <div className="header-actions">
-          <TicketBadge value={ticket.priority} kind="priority" />
-          <TicketBadge value={ticket.status} kind="status" />
-          <Link to="/tickets/new" className="button-link">
-            New Ticket
-          </Link>
-          <BackButton label="← Back" fallbackPath="/tickets" />
-        </div>
-      </div>
 
-      <div className="ticket-layout">
-        <section className="panel stack">
-          <div className="detail-grid">
-            <div>
-              <p className="detail-label">Category</p>
-              <strong>{ticket.category}</strong>
-            </div>
-            <div>
-              <p className="detail-label">Preferred Contact</p>
-              <strong>{ticket.preferredContact}</strong>
-            </div>
-            <div>
-              <p className="detail-label">Location</p>
-              <strong>{ticket.locationText || "Not provided"}</strong>
-            </div>
-            <div>
-              <p className="detail-label">Resource</p>
-              <strong>{ticket.resourceName || "No linked resource"}</strong>
-            </div>
-            <div>
-              <p className="detail-label">Assigned Technician</p>
-              <strong>{ticket.assignedTechnician?.name || "Not assigned yet"}</strong>
-            </div>
+        {ticket.resolutionNotes && (
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+              Resolution Notes
+            </p>
+            <p className="mt-2 text-sm leading-6 text-emerald-800">{ticket.resolutionNotes}</p>
           </div>
+        )}
 
-          <div>
-            <p className="detail-label">Description</p>
-            <p className="ticket-description">{ticket.description}</p>
+        {ticket.rejectionReason && (
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+              Rejection Reason
+            </p>
+            <p className="mt-2 text-sm leading-6 text-rose-800">{ticket.rejectionReason}</p>
           </div>
+        )}
 
-          {ticket.resolutionNotes && (
-            <div className="info-callout resolved-callout">
-              <p className="detail-label">Resolution Notes</p>
-              <p>{ticket.resolutionNotes}</p>
-            </div>
-          )}
+        <AttachmentPreviewGrid attachments={ticket.attachments} />
+      </Card>
 
-          {ticket.rejectionReason && (
-            <div className="info-callout rejected-callout">
-              <p className="detail-label">Rejection Reason</p>
-              <p>{ticket.rejectionReason}</p>
-            </div>
-          )}
-
-          <AttachmentPreviewGrid attachments={ticket.attachments} />
-        </section>
-
-        <div className="stack">
-          <TechnicianUpdatePanel
-            ticket={ticket}
-            canManage={canManage}
-            onTicketUpdated={setTicket}
-          />
-          <CommentSection ticket={ticket} onTicketUpdated={setTicket} />
-        </div>
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)]">
+        <TechnicianUpdatePanel ticket={ticket} onTicketUpdated={setTicket} />
+        <CommentSection ticket={ticket} onTicketUpdated={setTicket} />
       </div>
     </section>
   );
