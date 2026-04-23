@@ -127,6 +127,16 @@ public class BookingServiceImpl implements BookingService {
             booking.setRejectionReason(null);
         }
 
+        // Update the resource's active status based on booking status
+        Resource resource = booking.getResource();
+        if (request.getStatus() == BookingStatus.APPROVED) {
+            resource.setActive(false);
+            resourceRepository.save(resource);
+        } else if (request.getStatus() == BookingStatus.CANCELLED || request.getStatus() == BookingStatus.REJECTED) {
+            resource.setActive(true);
+            resourceRepository.save(resource);
+        }
+
         Booking updatedBooking = bookingRepository.save(booking);
         return mapToResponse(updatedBooking);
     }
