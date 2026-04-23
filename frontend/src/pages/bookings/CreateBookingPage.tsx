@@ -116,6 +116,15 @@ export function CreateBookingPage() {
     }
   };
 
+  // Get current date-time mapped for the datetime-local input min attribute
+  const getCurrentDateTimeString = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  };
+
+  const currentDateTime = getCurrentDateTimeString();
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -169,6 +178,7 @@ export function CreateBookingPage() {
                 type="datetime-local"
                 id="startDate"
                 name="startDate"
+                min={currentDateTime}
                 value={formData.startDate}
                 onChange={handleChange}
                 required
@@ -180,6 +190,7 @@ export function CreateBookingPage() {
                 type="datetime-local"
                 id="endDate"
                 name="endDate"
+                min={formData.startDate || currentDateTime}
                 value={formData.endDate}
                 onChange={handleChange}
                 required
