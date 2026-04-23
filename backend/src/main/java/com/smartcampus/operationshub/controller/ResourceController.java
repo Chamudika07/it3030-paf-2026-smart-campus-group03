@@ -4,6 +4,7 @@ import com.smartcampus.operationshub.dto.request.CreateResourceRequest;
 import com.smartcampus.operationshub.dto.request.UpdateResourceRequest;
 import com.smartcampus.operationshub.dto.response.ApiResponse;
 import com.smartcampus.operationshub.dto.response.ResourceResponse;
+import com.smartcampus.operationshub.enums.ResourceCategory;
 import com.smartcampus.operationshub.service.ResourceService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -54,6 +56,18 @@ public class ResourceController {
     public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
         resourceService.deleteResource(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<ResourceResponse>>> searchResources(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) ResourceCategory category,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Integer minCapacity,
+            @RequestParam(required = false) Boolean active) {
+        
+        List<ResourceResponse> results = resourceService.searchResources(query, category, location, minCapacity, active);
+        return ResponseEntity.ok(new ApiResponse<>("Search completed", results));
     }
 }
 
