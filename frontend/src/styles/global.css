@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   font-family: "Segoe UI", sans-serif;
   color: #10212f;
@@ -328,6 +330,10 @@ textarea {
   border-radius: 20px;
   background: #ffffff;
   box-shadow: 0 22px 60px rgba(15, 42, 61, 0.2);
+}
+
+.notification-row {
+  grid-template-columns: 1fr auto;
 }
 
 .notification-panel-header,

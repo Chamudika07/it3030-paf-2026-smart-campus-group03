@@ -16,11 +16,11 @@ export function AppRoutes() {
   return useRoutes([
     {
       path: "/login",
-      element: <LoginPage />
+      element: <LoginPage />,
     },
     {
       path: "/access-denied",
-      element: <AccessDeniedPage />
+      element: <AccessDeniedPage />,
     },
     {
       path: "/",
@@ -48,13 +48,13 @@ export function AppRoutes() {
                 <p className="muted-text">Role-protected admin area for future team features.</p>
               </section>
             </ProtectedRoute>
-          )
+          ),
         }
-      ]
+      ],
     },
     {
       path: "*",
-      element: <NotFoundPage />
+      element: <NotFoundPage />,
     }
   ]);
 }

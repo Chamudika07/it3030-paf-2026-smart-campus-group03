@@ -45,6 +45,7 @@ export function NotificationsPage() {
         <div>
           <p className="eyebrow">Member 4 ownership</p>
           <h2>Notifications</h2>
+          <p className="muted-text">Review booking decisions, ticket updates, and operational alerts.</p>
         </div>
         <button
           className="button-secondary"

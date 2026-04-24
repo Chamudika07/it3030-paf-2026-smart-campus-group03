@@ -1,30 +1,91 @@
+import { NavLink } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { NotificationBell } from "../notifications/NotificationBell";
 
-export function Navbar() {
+type NavbarProps = {
+  onToggleSidebar?: () => void;
+};
+
+const topLinks = [
+  { to: "/dashboard", label: "Overview" },
+  { to: "/tickets", label: "Tickets" },
+  { to: "/resources", label: "Resources" }
+];
+
+export function Navbar({ onToggleSidebar }: NavbarProps) {
   const { user, logout } = useAuth();
+  const initials = (user?.name ?? "Guest")
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("")
+    .slice(0, 2);
 
   return (
-    <header className="topbar">
-      <div>
-        <p className="eyebrow">Smart Campus Operations Hub</p>
-        <h1>Team Dashboard</h1>
-      </div>
-      <div className="topbar-actions">
-        <NotificationBell />
-        <div className="session-card">
-          {user?.avatarUrl ? (
-            <img src={user.avatarUrl} alt="" className="avatar" />
-          ) : (
-            <div className="avatar avatar-fallback">{user?.name?.charAt(0) ?? "U"}</div>
-          )}
-          <div>
-            <strong>{user?.name ?? "Guest"}</strong>
-            <span>{user?.email}</span>
-            <small>{user?.role}</small>
+    <header className="sticky top-0 z-30 mb-6 rounded-2xl border border-[#E2E8F0] bg-white/90 px-4 py-4 shadow-md shadow-slate-200/40 backdrop-blur lg:px-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E2E8F0] text-[#334155] transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#DBEAFE] lg:hidden"
+            aria-label="Toggle sidebar"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+            </svg>
+          </button>
+
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94A3B8]">
+              Smart Campus Operations Hub
+            </p>
+            <h1 className="text-2xl font-semibold tracking-tight text-[#0F172A]">Team Dashboard</h1>
           </div>
         </div>
-        <button className="button-secondary" onClick={logout}>Logout</button>
+
+        <nav className="hidden items-center gap-2 md:flex">
+          {topLinks.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) =>
+                [
+                  "rounded-xl px-3 py-2 text-sm font-medium transition",
+                  isActive
+                    ? "bg-[#DBEAFE] text-[#1D4ED8]"
+                    : "text-[#334155] hover:bg-slate-100 hover:text-[#0F172A]"
+                ].join(" ")
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="flex items-center justify-between gap-3 lg:justify-end">
+          <NotificationBell />
+
+          <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-2">
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#DBEAFE] text-sm font-semibold text-[#1D4ED8]">
+                {initials || "G"}
+              </div>
+            )}
+            <div>
+              <p className="text-sm font-semibold text-[#0F172A]">{user?.name ?? "Guest"}</p>
+              <p className="text-xs text-[#64748B]">{user?.email ?? "Not signed in"}</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-[#94A3B8]">
+                {user?.role ?? "No role"}
+              </p>
+            </div>
+          </div>
+
+          <button type="button" className="button-secondary" onClick={logout}>
+            Logout
+          </button>
+        </div>
       </div>
     </header>
   );
