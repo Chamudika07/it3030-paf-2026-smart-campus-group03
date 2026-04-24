@@ -1,33 +1,23 @@
 package com.smartcampus.operationshub.service;
 
-import com.smartcampus.operationshub.entity.Notification;
-import com.smartcampus.operationshub.repository.NotificationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.smartcampus.operationshub.dto.response.notification.NotificationResponse;
 import java.util.List;
 
-@Service
-public class NotificationService {
+public interface NotificationService {
 
-    @Autowired
-    private NotificationRepository notificationRepository;
+    List<NotificationResponse> getCurrentUserNotifications();
 
-    public void sendNotification(String email, String message) {
-        Notification notification = new Notification();
-        notification.setMessage(message);
-        notification.setUserEmail(email);
-        notification.setIsRead(false);
-        notificationRepository.save(notification);
-    }
+    long getCurrentUserUnreadCount();
 
-    public List<Notification> getNotifications(String email) {
-        return notificationRepository.findByUserEmailAndIsReadFalse(email);  // Fetch unread notifications
-    }
+    NotificationResponse markAsRead(Long notificationId);
 
-    public void markAsRead(Long id) {
-        Notification notification = notificationRepository.findById(id).orElseThrow();
-        notification.setIsRead(true);
-        notificationRepository.save(notification);
-    }
+    void markAllAsRead();
+
+    void notifyBookingApproved(Long userId, Long bookingId, String bookingTitle);
+
+    void notifyBookingRejected(Long userId, Long bookingId, String bookingTitle);
+
+    void notifyTicketStatusChangedByIdentifier(String userIdentifier, Long ticketId, String status);
+
+    void notifyNewCommentByIdentifier(String userIdentifier, Long ticketId, String commentAuthorName);
 }
