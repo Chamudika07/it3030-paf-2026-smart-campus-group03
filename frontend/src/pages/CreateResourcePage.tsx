@@ -243,7 +243,7 @@ export function CreateResourcePage() {
           {/* Resource Code Field */}
           <div className="form-group">
             <label htmlFor="code">
-              Hall Code <span className="required">*</span>
+              Resource Code <span className="required">*</span>
             </label>
             <select
               id="code"
