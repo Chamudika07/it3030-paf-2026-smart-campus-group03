@@ -1,6 +1,7 @@
 package com.smartcampus.operationshub.controller;
 
 import com.smartcampus.operationshub.dto.response.ApiResponse;
+import com.smartcampus.operationshub.dto.response.auth.AuthSessionResponse;
 import com.smartcampus.operationshub.dto.response.auth.AuthUserResponse;
 import com.smartcampus.operationshub.entity.AppUser;
 import com.smartcampus.operationshub.service.AuthService;
@@ -21,6 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+
+    @GetMapping("/session")
+    public ResponseEntity<ApiResponse<AuthSessionResponse>> getSession(Authentication authentication) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                "Authentication session fetched successfully",
+                authService.findAuthenticatedUser(authentication)
+                        .map(user -> new AuthSessionResponse(true, authService.toResponse(user)))
+                        .orElseGet(() -> new AuthSessionResponse(false, null))
+        ));
+    }
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<AuthUserResponse>> getCurrentUser(Authentication authentication) {

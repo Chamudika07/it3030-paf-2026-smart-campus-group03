@@ -1,7 +1,11 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { AuthContextValue, UserRole } from "../types/auth";
-import { fetchCurrentUser, logoutCurrentUser, redirectToGoogleLogin } from "../api/authApi";
+import {
+  fetchAuthSession,
+  logoutCurrentUser,
+  redirectToGoogleLogin
+} from "../api/authApi";
 
 const defaultValue: AuthContextValue = {
   user: null,
@@ -26,21 +30,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
 
   const refreshUser = useCallback(async () => {
-    try {
-      const currentUser = await fetchCurrentUser();
+    const session = await fetchAuthSession();
+    if (session.authenticated && session.user) {
+      const currentUser = session.user;
       localStorage.setItem("smart-campus-user", JSON.stringify(currentUser));
       setUser(currentUser);
-    } catch {
-      localStorage.removeItem("smart-campus-user");
-      setUser(null);
-    } finally {
       setLoading(false);
+      return;
     }
+
+    localStorage.removeItem("smart-campus-user");
+    setUser(null);
+    setLoading(false);
+    throw new Error("Unable to refresh authenticated user");
   }, []);
 
   useEffect(() => {
-    void refreshUser();
-  }, [refreshUser]);
+    let cancelled = false;
+
+    async function initializeAuth() {
+      try {
+        const session = await fetchAuthSession();
+        if (cancelled) {
+          return;
+        }
+
+        if (session.authenticated && session.user) {
+          localStorage.setItem("smart-campus-user", JSON.stringify(session.user));
+          setUser(session.user);
+        } else {
+          localStorage.removeItem("smart-campus-user");
+          setUser(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void initializeAuth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const login = () => {
     redirectToGoogleLogin();

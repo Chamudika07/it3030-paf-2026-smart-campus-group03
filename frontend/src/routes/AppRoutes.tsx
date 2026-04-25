@@ -7,6 +7,7 @@ import { BookingsPage } from "../pages/BookingsPage";
 import { TicketsPage } from "../pages/TicketsPage";
 import { NotificationsPage } from "../pages/NotificationsPage";
 import { LoginPage } from "../pages/LoginPage";
+import { AuthCallbackPage } from "../pages/AuthCallbackPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 import { AccessDeniedPage } from "../pages/AccessDeniedPage";
 import { CreateTicketPage } from "../pages/tickets/CreateTicketPage";
@@ -17,6 +18,10 @@ export function AppRoutes() {
     {
       path: "/login",
       element: <LoginPage />,
+    },
+    {
+      path: "/auth/callback",
+      element: <AuthCallbackPage />,
     },
     {
       path: "/access-denied",

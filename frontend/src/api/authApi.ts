@@ -6,8 +6,18 @@ type ApiResponse<T> = {
   data: T;
 };
 
+type AuthSession = {
+  authenticated: boolean;
+  user: AuthUser | null;
+};
+
 export async function fetchCurrentUser() {
   const response = await http.get<ApiResponse<AuthUser>>("/auth/me");
+  return response.data.data;
+}
+
+export async function fetchAuthSession() {
+  const response = await http.get<ApiResponse<AuthSession>>("/auth/session");
   return response.data.data;
 }
 

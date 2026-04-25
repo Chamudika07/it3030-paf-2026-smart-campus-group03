@@ -40,5 +40,5 @@ app:
   storage:
     ticket-attachments-dir: ${TICKET_ATTACHMENTS_DIR:uploads/tickets}
   oauth2:
-    success-redirect-uri: ${OAUTH2_SUCCESS_REDIRECT_URI:${FRONTEND_URL:http://localhost:5173}/dashboard}
+    success-redirect-uri: ${OAUTH2_SUCCESS_REDIRECT_URI:${FRONTEND_URL:http://localhost:5173}/auth/callback}
     failure-redirect-uri: ${OAUTH2_FAILURE_REDIRECT_URI:${FRONTEND_URL:http://localhost:5173}/login?error=oauth}
