@@ -11,6 +11,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class CorsConfig {
 
+    private static final List<String> DEFAULT_ALLOWED_ORIGINS = List.of(
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5175",
+            "http://localhost:5176",
+            "http://localhost:5177"
+    );
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource(AppProperties appProperties) {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -18,12 +26,12 @@ public class CorsConfig {
                 ? null
                 : appProperties.getCors().getAllowedOrigins();
         configuration.setAllowedOrigins(
-            allowedOrigins == null || allowedOrigins.isBlank()
-                ? List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175")
-            : Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .filter(origin -> !origin.isBlank())
-                .toList()
+                allowedOrigins == null || allowedOrigins.isBlank()
+                        ? DEFAULT_ALLOWED_ORIGINS
+                        : Arrays.stream(allowedOrigins.split(","))
+                                .map(String::trim)
+                                .filter(origin -> !origin.isBlank())
+                                .toList()
         );
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

@@ -1,8 +1,10 @@
 package com.smartcampus.operationshub.controller.booking;
 
+import com.smartcampus.operationshub.dto.request.BookingAvailabilityRequest;
 import com.smartcampus.operationshub.dto.request.CreateBookingRequest;
 import com.smartcampus.operationshub.dto.request.UpdateBookingStatusRequest;
 import com.smartcampus.operationshub.dto.response.ApiResponse;
+import com.smartcampus.operationshub.dto.response.BookingAvailabilityResponse;
 import com.smartcampus.operationshub.dto.response.BookingResponse;
 import com.smartcampus.operationshub.service.booking.BookingService;
 import jakarta.validation.Valid;
@@ -36,6 +38,13 @@ public class BookingController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<BookingResponse>> getBookingById(@PathVariable Long id) {
         return ResponseEntity.ok(new ApiResponse<>("Booking fetched successfully", bookingService.getBookingById(id)));
+    }
+
+    @PostMapping("/availability")
+    public ResponseEntity<ApiResponse<BookingAvailabilityResponse>> checkAvailability(
+            @Valid @RequestBody BookingAvailabilityRequest request) {
+        BookingAvailabilityResponse response = bookingService.checkBookingAvailability(request);
+        return ResponseEntity.ok(new ApiResponse<>("Booking availability checked successfully", response));
     }
 
     @PatchMapping("/{id}/status")

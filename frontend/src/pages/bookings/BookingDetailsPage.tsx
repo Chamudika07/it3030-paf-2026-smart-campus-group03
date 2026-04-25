@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchBookings, updateBookingStatus } from "../../api/bookingApi";
+import { fetchBookingById, updateBookingStatus } from "../../api/bookingApi";
 import { BookingBadge } from "../../components/bookings/BookingBadge";
 import { useAuth } from "../../hooks/useAuth";
 import type { Booking } from "../../types/booking";
@@ -21,8 +21,7 @@ export function BookingDetailsPage() {
   useEffect(() => {
     async function loadBooking() {
       try {
-        const bookings = await fetchBookings();
-        const found = bookings.find((b) => b.id === Number(bookingId));
+        const found = await fetchBookingById(Number(bookingId));
         if (found) {
           setBooking(found);
         } else {
@@ -65,9 +64,17 @@ export function BookingDetailsPage() {
       setActionSuccess(`Booking effectively ${status.toLowerCase()}.`);
       if (status !== "REJECTED") setRejectionReason("");
     } catch (err: any) {
-      setActionError(
-        err.response?.data?.message || `Failed to change status to ${status}.`,
-      );
+      if (err.response?.data?.validationErrors) {
+        const errors = Object.values(err.response.data.validationErrors).join(
+          " | ",
+        );
+        setActionError(errors);
+      } else {
+        setActionError(
+          err.response?.data?.message ||
+            `Failed to change status to ${status}.`,
+        );
+      }
     }
   };
 
