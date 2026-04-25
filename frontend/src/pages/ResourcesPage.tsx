@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
-import { fetchResources } from "../api/resourceApi";
+import { Link, useNavigate } from "react-router-dom";
+import { fetchResources, searchResources as searchResourcesApi } from "../api/resourceApi";
+import { ResourceSearchFilter } from "../components/resources/ResourceSearchFilter";
+import { ResourceStatusBadge } from "../components/resources/ResourceStatusBadge";
 import { Badge } from "../components/ui/Badge";
 import { DataTable } from "../components/ui/DataTable";
 import { PageHeader } from "../components/ui/PageHeader";
 import type { Resource } from "../types/resource";
+import type { SearchFilters } from "../api/resourceApi";
 
 export function ResourcesPage() {
+  const navigate = useNavigate();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     async function loadResources() {
@@ -25,60 +31,93 @@ export function ResourcesPage() {
     loadResources();
   }, []);
 
+  const handleSearch = async (filters: SearchFilters) => {
+    setLoading(true);
+    setHasSearched(true);
+    try {
+      const data = await searchResourcesApi(filters);
+      setResources(data);
+      setError("");
+    } catch (err) {
+      setError("Search failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="space-y-6">
       <PageHeader
         eyebrow="Member 1 ownership"
         title="Resources"
-        description="Track campus labs, equipment, meeting rooms, and operational availability from one searchable table."
-        actions={<Badge tone="orange">{resources.length} listed</Badge>}
+        description="Manage campus facilities and assets with search, status visibility, and quick access to resource details."
+        actions={
+          <>
+            <Badge tone="orange">{resources.length} listed</Badge>
+            <Link to="/resources/new" className="button-link">
+              + Create
+            </Link>
+          </>
+        }
       />
 
+      <ResourceSearchFilter onSearch={handleSearch} />
+
       {loading && (
-        <div className="rounded-2xl border border-[#E2E8F0] bg-white px-6 py-5 text-sm text-[#334155] shadow-md shadow-slate-200/50">
-          Loading resources...
-        </div>
+        <div className="panel">Loading resources...</div>
       )}
-      {error && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-6 py-5 text-sm text-rose-700">
-          {error}
-        </div>
-      )}
+      {error && <div className="panel error-panel">{error}</div>}
 
       {!loading && !error && (
-        <DataTable columns={["Code", "Name", "Category", "Location", "Capacity", "Status"]}>
-          {resources.length === 0 ? (
-            <tr>
-              <td className="px-6 py-10 text-sm text-[#94A3B8]" colSpan={6}>
-                No resources yet. Add your first resource from the backend API.
-              </td>
-            </tr>
-          ) : (
-            resources.map((resource, index) => (
-              <tr
-                key={resource.id}
-                className={index % 2 === 0 ? "bg-white" : "bg-[#F8FAFC]"}
-              >
-                <td className="px-6 py-4 text-sm font-semibold text-[#0F172A]">{resource.code}</td>
-                <td className="px-6 py-4 text-sm text-[#334155]">{resource.name}</td>
-                <td className="px-6 py-4 text-sm text-[#334155]">{resource.category}</td>
-                <td className="px-6 py-4 text-sm text-[#334155]">{resource.location}</td>
-                <td className="px-6 py-4 text-sm text-[#334155]">{resource.capacity}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span
-                    className={[
-                      "inline-flex rounded-full px-3 py-1 text-xs font-semibold",
-                      resource.active ? "bg-[#DBEAFE] text-[#1D4ED8]" : "bg-slate-100 text-[#334155]"
-                    ].join(" ")}
-                  >
-                    {resource.active ? "Active" : "Inactive"}
-                  </span>
-                </td>
-              </tr>
-            ))
-          )}
+        <DataTable columns={["Code", "Name", "Category", "Location", "Capacity", "Status", "Actions"]}>
+          <>
+              {resources.length === 0 ? (
+                <tr>
+                  <td className="px-6 py-10 text-sm text-[#94A3B8]" colSpan={7}>
+                    {hasSearched
+                      ? "No resources match your search."
+                      : "No resources yet. Add your first resource from the backend API."}
+                  </td>
+                </tr>
+              ) : (
+                resources.map((resource, index) => (
+                  <tr key={resource.id}>
+                    <td className={index % 2 === 0 ? "bg-white px-6 py-4 text-sm font-semibold text-[#0F172A]" : "bg-[#F8FAFC] px-6 py-4 text-sm font-semibold text-[#0F172A]"}>
+                      {resource.code}
+                    </td>
+                    <td className={index % 2 === 0 ? "bg-white px-6 py-4 text-sm text-[#334155]" : "bg-[#F8FAFC] px-6 py-4 text-sm text-[#334155]"}>
+                      {resource.name}
+                    </td>
+                    <td className={index % 2 === 0 ? "bg-white px-6 py-4 text-sm text-[#334155]" : "bg-[#F8FAFC] px-6 py-4 text-sm text-[#334155]"}>
+                      {resource.category}
+                    </td>
+                    <td className={index % 2 === 0 ? "bg-white px-6 py-4 text-sm text-[#334155]" : "bg-[#F8FAFC] px-6 py-4 text-sm text-[#334155]"}>
+                      {resource.location}
+                    </td>
+                    <td className={index % 2 === 0 ? "bg-white px-6 py-4 text-sm text-[#334155]" : "bg-[#F8FAFC] px-6 py-4 text-sm text-[#334155]"}>
+                      {resource.capacity}
+                    </td>
+                    <td className={index % 2 === 0 ? "bg-white px-6 py-4 text-sm" : "bg-[#F8FAFC] px-6 py-4 text-sm"}>
+                      <ResourceStatusBadge active={resource.active} size="sm" />
+                    </td>
+                    <td className={index % 2 === 0 ? "bg-white px-6 py-4 text-sm" : "bg-[#F8FAFC] px-6 py-4 text-sm"}>
+                      <div className="action-buttons">
+                        <button
+                          onClick={() => navigate(`/resources/${resource.id}`)}
+                          className="action-button view-button"
+                          title="View resource details"
+                        >
+                          👁️ View
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+          </>
         </DataTable>
       )}
+
     </section>
   );
 }

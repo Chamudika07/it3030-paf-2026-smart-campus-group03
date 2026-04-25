@@ -4,6 +4,7 @@ import com.smartcampus.operationshub.dto.request.CreateResourceRequest;
 import com.smartcampus.operationshub.dto.request.UpdateResourceRequest;
 import com.smartcampus.operationshub.dto.response.ResourceResponse;
 import com.smartcampus.operationshub.entity.Resource;
+import com.smartcampus.operationshub.enums.ResourceCategory;
 import com.smartcampus.operationshub.exception.DuplicateResourceException;
 import com.smartcampus.operationshub.exception.ResourceNotFoundException;
 import com.smartcampus.operationshub.repository.ResourceRepository;
@@ -75,6 +76,23 @@ public class ResourceServiceImpl implements ResourceService {
         Resource resource = resourceRepository.findById(safeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
         resourceRepository.delete(Objects.requireNonNull(resource, "Resource to delete must not be null"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ResourceResponse> searchResources(
+            String query,
+            ResourceCategory category,
+            String location,
+            Integer minCapacity,
+            Boolean active) {
+        String safeQuery = query == null ? "" : query;
+        String safeLocation = location == null ? "" : location;
+        
+        return resourceRepository.searchResources(safeQuery, category, safeLocation, minCapacity, active)
+                .stream()
+                .map(ResourceMapper::toResponse)
+                .toList();
     }
 }
 
