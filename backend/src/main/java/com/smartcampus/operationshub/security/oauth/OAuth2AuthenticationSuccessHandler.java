@@ -19,10 +19,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private static final Logger log = LoggerFactory.getLogger(OAuth2AuthenticationSuccessHandler.class);
 
     private final AppProperties appProperties;
+    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
+        authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
         log.info("OAuth2 login succeeded for principal='{}', redirecting to '{}'",
                 authentication == null ? "unknown" : authentication.getName(),
                 appProperties.getOauth2().getSuccessRedirectUri());

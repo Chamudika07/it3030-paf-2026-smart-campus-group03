@@ -30,6 +30,10 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 15MB
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
 
 server:
   port: ${SERVER_PORT:8080}
@@ -40,5 +44,5 @@ app:
   storage:
     ticket-attachments-dir: ${TICKET_ATTACHMENTS_DIR:uploads/tickets}
   oauth2:
-    success-redirect-uri: ${OAUTH2_SUCCESS_REDIRECT_URI:${FRONTEND_URL:http://localhost:5173}/auth/callback}
+    success-redirect-uri: ${OAUTH2_SUCCESS_REDIRECT_URI:${FRONTEND_URL:http://localhost:5173}/dashboard}
     failure-redirect-uri: ${OAUTH2_FAILURE_REDIRECT_URI:${FRONTEND_URL:http://localhost:5173}/login?error=oauth}

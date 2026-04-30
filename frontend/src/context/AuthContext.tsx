@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { AuthContextValue, UserRole } from "../types/auth";
 import {
@@ -28,37 +28,49 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthContextValue["user"]>(null);
   const [loading, setLoading] = useState(true);
+  const initializedRef = useRef(false);
 
-  const refreshUser = useCallback(async () => {
+  const syncSession = useCallback(async () => {
     const session = await fetchAuthSession();
     if (session.authenticated && session.user) {
-      const currentUser = session.user;
-      localStorage.setItem("smart-campus-user", JSON.stringify(currentUser));
-      setUser(currentUser);
-      setLoading(false);
-      return;
+      localStorage.setItem("smart-campus-user", JSON.stringify(session.user));
+      setUser(session.user);
+      return session.user;
     }
 
     localStorage.removeItem("smart-campus-user");
     setUser(null);
-    setLoading(false);
-    throw new Error("Unable to refresh authenticated user");
+    return null;
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    const currentUser = await syncSession();
+    if (currentUser) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    throw new Error("Unable to refresh authenticated user");
+  }, [syncSession]);
+
   useEffect(() => {
+    if (initializedRef.current) {
+      return;
+    }
+    initializedRef.current = true;
+
     let cancelled = false;
 
     async function initializeAuth() {
       try {
-        const session = await fetchAuthSession();
         if (cancelled) {
           return;
         }
 
-        if (session.authenticated && session.user) {
-          localStorage.setItem("smart-campus-user", JSON.stringify(session.user));
-          setUser(session.user);
-        } else {
+        await syncSession();
+      } catch {
+        if (!cancelled) {
           localStorage.removeItem("smart-campus-user");
           setUser(null);
         }
@@ -74,7 +86,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [syncSession]);
 
   const login = () => {
     redirectToGoogleLogin();

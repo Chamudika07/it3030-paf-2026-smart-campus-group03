@@ -1,6 +1,7 @@
 package com.smartcampus.operationshub.security;
 
 import com.smartcampus.operationshub.security.oauth.CustomOAuth2UserService;
+import com.smartcampus.operationshub.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.smartcampus.operationshub.security.oauth.OAuth2AuthenticationFailureHandler;
 import com.smartcampus.operationshub.security.oauth.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
     private final OAuth2AuthenticationSuccessHandler successHandler;
     private final OAuth2AuthenticationFailureHandler failureHandler;
 
@@ -48,6 +50,9 @@ public class SecurityConfig {
                         new AntPathRequestMatcher("/api/**")
                 ))
                 .oauth2Login(oauth -> oauth
+                        .authorizationEndpoint(authorization ->
+                                authorization.authorizationRequestRepository(authorizationRequestRepository)
+                        )
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(successHandler)
                         .failureHandler(failureHandler)
