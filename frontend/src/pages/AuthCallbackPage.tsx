@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
-const MAX_ATTEMPTS = 6;
-const RETRY_DELAY_MS = 500;
+const MAX_ATTEMPTS = 2;
+const RETRY_DELAY_MS = 300;
 
 function sleep(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -11,12 +11,17 @@ function sleep(ms: number) {
 
 export function AuthCallbackPage() {
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { isAuthenticated, loading, refreshUser } = useAuth();
   const [message, setMessage] = useState("Completing Google sign-in...");
   const [failed, setFailed] = useState(false);
   const startedRef = useRef(false);
 
   useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+      return;
+    }
+
     if (startedRef.current) {
       return;
     }
@@ -53,7 +58,7 @@ export function AuthCallbackPage() {
     return () => {
       cancelled = true;
     };
-  }, [navigate, refreshUser]);
+  }, [isAuthenticated, loading, navigate, refreshUser]);
 
   return (
     <section className="auth-page">
