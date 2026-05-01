@@ -1,0 +1,307 @@
+{
+  "info": {
+    "name": "Smart Campus Operations Hub",
+    "description": "Postman collection for testing the Smart Campus Operations Hub backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "resourceId",
+      "value": "1"
+    },
+    {
+      "key": "bookingId",
+      "value": "1"
+    },
+    {
+      "key": "ticketId",
+      "value": "1"
+    },
+    {
+      "key": "commentId",
+      "value": "1"
+    },
+    {
+      "key": "attachmentId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resources",
+      "item": [
+        {
+          "name": "Get All Resources",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/resources"
+          }
+        },
+        {
+          "name": "Get Resource By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/resources/{{resourceId}}"
+          }
+        },
+        {
+          "name": "Search Resources",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/resources/search?query=Hall&category=LECTURE_HALL&location=Building%20A&minCapacity=50&active=true"
+          }
+        },
+        {
+          "name": "Create Resource",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"LAB900\",\n  \"name\": \"Innovation Lab\",\n  \"category\": \"LAB\",\n  \"location\": \"Building D, 2nd Floor\",\n  \"capacity\": 45\n}"
+            },
+            "url": "{{baseUrl}}/api/resources"
+          }
+        },
+        {
+          "name": "Update Resource",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Innovation Lab Updated\",\n  \"category\": \"LAB\",\n  \"location\": \"Building D, 3rd Floor\",\n  \"capacity\": 50,\n  \"active\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/resources/{{resourceId}}"
+          }
+        },
+        {
+          "name": "Delete Resource",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/resources/{{resourceId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Get All Bookings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/bookings"
+          }
+        },
+        {
+          "name": "Get Booking By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}"
+          }
+        },
+        {
+          "name": "Check Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceId\": 1,\n  \"startDate\": \"2026-05-01T10:00:00\",\n  \"endDate\": \"2026-05-01T12:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/api/bookings/availability"
+          }
+        },
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceId\": 1,\n  \"startDate\": \"2026-05-01T10:00:00\",\n  \"endDate\": \"2026-05-01T12:00:00\",\n  \"purpose\": \"Software engineering presentation\",\n  \"expectedAttendees\": 80\n}"
+            },
+            "url": "{{baseUrl}}/api/bookings"
+          }
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"reason\": \"Room is available\"\n}"
+            },
+            "url": "{{baseUrl}}/api/bookings/{{bookingId}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "Get All Tickets",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/tickets"
+          }
+        },
+        {
+          "name": "Get Ticket By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "Create Ticket (JSON only)",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "ticket",
+                  "type": "text",
+                  "value": "{\n  \"title\": \"Projector not working\",\n  \"category\": \"EQUIPMENT\",\n  \"description\": \"Projector in Lecture Hall 1 does not power on.\",\n  \"priority\": \"HIGH\",\n  \"preferredContact\": \"student1@campus.edu\",\n  \"locationText\": \"Lecture Hall 1\",\n  \"resourceId\": 1\n}"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/tickets"
+          }
+        },
+        {
+          "name": "Assign Technician",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"technicianIdentifier\": \"tech-001\",\n  \"technicianName\": \"Alex Perera\",\n  \"technicianEmail\": \"alex.perera@campus.edu\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tickets/{{ticketId}}/assign"
+          }
+        },
+        {
+          "name": "Update Ticket Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RESOLVED\",\n  \"resolutionNotes\": \"Projector cable replaced successfully\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tickets/{{ticketId}}/status"
+          }
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Technician visited the location and started diagnostics.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tickets/{{ticketId}}/comments"
+          }
+        },
+        {
+          "name": "Get Attachment By Id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/tickets/attachments/{{attachmentId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Update Comment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated comment content after rechecking the issue.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/comments/{{commentId}}"
+          }
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/comments/{{commentId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

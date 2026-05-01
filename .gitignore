@@ -2,7 +2,6 @@
 .DS_Store
 
 # Editors
-.vscode/
 .idea/
 
 # Logs
@@ -10,8 +9,6 @@
 logs/
 
 # Environment files
-.env
-.env.local
 .env.*.local
 backend/.env
 frontend/.env
@@ -34,3 +31,5 @@ tmp/
 *.swp
 
 
+config.bat
+node_modules
